@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Certified Developer – Foundations Study Notebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: #c8c5be;
+    font-family: 'Patrick Hand', 'Caveat', cursive;
+    color: #2d2d2d;
+  }
+
+  /* Top Binder Bar */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #23272e;
+    color: #fbfaf7;
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.35);
+    border-bottom: 3px solid #d97757;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-badge {
+    background: #d97757;
+    color: #fff;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 20px;
+    padding: 2px 10px;
+    border-radius: 6px;
+    transform: rotate(-1.5deg);
+  }
+  .brand-title {
+    font-family: 'Caveat', cursive;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fbfaf7;
+    letter-spacing: .3px;
+  }
+
+  /* Folder Tabs */
+  .tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 15px;
+    padding: 6px 13px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: #343a44;
+    color: #e2e0db;
+    cursor: pointer;
+    transition: all .15s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+  }
+  .tab-btn:hover {
+    background: #434b57;
+    transform: translateY(-1px);
+  }
+  .tab-btn.active {
+    background: #fbfaf7;
+    color: #1a4cb0;
+    border-color: #d97757;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  }
+  .tab-tag {
+    font-family: 'Caveat', cursive;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 6px;
+    border-radius: 4px;
+    background: rgba(0,0,0,.2);
+    color: #ffd966;
+  }
+  .tab-btn.active .tab-tag {
+    background: #1a4cb0;
+    color: #fff;
+  }
+
+  /* Right Controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ctrl-btn {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 14.5px;
+    padding: 5px 11px;
+    border-radius: 6px;
+    border: 1px solid #555d69;
+    background: #2f353f;
+    color: #fbfaf7;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .ctrl-btn:hover {
+    background: #434b57;
+  }
+  .ctrl-btn:disabled {
+    opacity: .4;
+    cursor: default;
+  }
+
+  /* Views */
+  .view-container {
+    height: calc(100vh - 55px);
+    overflow-y: auto;
+  }
+  #readerView {
+    display: none;
+    width: 100%;
+    height: 100%;
+  }
+  #readerFrame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #d9d7d2;
+  }
+
+  /* Notebook Cover / Index Page (A4 Handwritten Style) */
+  .page {
+    position: relative;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 18px auto 32px;
+    padding: 32px 26px 28px 72px;
+    background-color: #fbfaf7;
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 21px, rgba(70,130,215,.30) 21px, rgba(70,130,215,.30) 22px);
+    background-position: 0 30px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.30);
+    color: #1a4cb0;
+    font-size: 15.5px;
+    line-height: 22px;
+  }
+  .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: 56px; width: 2px; background: rgba(232,105,135,.75); }
+  .page::after { content: ""; position: absolute; top: 0; bottom: 0; left: 60px; width: 1px; background: rgba(232,105,135,.35); }
+  .holes { position:absolute; left:14px; top:0; bottom:0; width:20px; }
+  .holes i { position:absolute; left:0; width:18px; height:18px; border-radius:50%; background:#c8c5be; box-shadow: inset 1px 2px 3px rgba(0,0,0,.35); }
+  .tape { position:absolute; top:-8px; right:65px; width:100px; height:26px; background: rgba(255,225,120,.6); transform: rotate(3.5deg); border-left:2px dotted rgba(0,0,0,.15); border-right:2px dotted rgba(0,0,0,.15); }
+
+  h1, h2, h3 { font-family: 'Caveat', cursive; color: #2d2d2d; margin: 0; font-weight: 700; line-height: 1; }
+  h1 { font-size: 40px; transform: rotate(-.5deg); }
+  h2 { font-size: 28px; margin-top: 12px; transform: rotate(-.3deg); }
+  .sub { font-family:'Caveat',cursive; font-size: 20px; color:#c0392b; line-height: 22px; margin-top: 2px; }
+  p { margin: 0; }
+  .hl { background: linear-gradient(transparent 12%, rgba(255,226,40,.65) 12%, rgba(255,226,40,.65) 92%, transparent 92%); padding: 0 3px; border-radius: 3px; }
+  .hlg { background: linear-gradient(transparent 12%, rgba(120,220,120,.45) 12%, rgba(120,220,120,.45) 92%, transparent 92%); padding: 0 3px; }
+  .hlp { background: linear-gradient(transparent 12%, rgba(255,150,190,.45) 12%, rgba(255,150,190,.45) 92%, transparent 92%); padding: 0 3px; }
+  .dk { color: #2d2d2d; }
+
+  /* Module Cards on Cover Page */
+  .mod-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .mod-card {
+    border: 2px solid #2d2d2d;
+    padding: 8px 14px;
+    border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px;
+    background: rgba(255,255,255,.55);
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .mod-card:hover {
+    transform: translateY(-2px) rotate(-.2deg);
+    box-shadow: 0 4px 12px rgba(26,76,176,.18);
+    background: rgba(255,253,240,.9);
+    border-color: #1a4cb0;
+  }
+  .mod-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .mod-num {
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    background: #1a4cb0;
+    padding: 0 8px;
+    border-radius: 6px;
+  }
+  .mod-title {
+    font-family: 'Caveat', cursive;
+    font-size: 26px;
+    font-weight: 700;
+    color: #2d2d2d;
+  }
+  .mod-meta {
+    font-family: 'Caveat', cursive;
+    font-size: 17px;
+    color: #c0392b;
+    margin-left: auto;
+  }
+  .mod-topics {
+    margin: 3px 0 0;
+    padding-left: 18px;
+    list-style: none;
+    font-size: 14.5px;
+    line-height: 20px;
+  }
+  .mod-topics li { position: relative; }
+  .mod-topics li::before {
+    content: "✦";
+    position: absolute;
+    left: -15px;
+    font-size: 11px;
+    color: #1a4cb0;
+  }
+  .open-pill {
+    font-family: 'Caveat', cursive;
+    font-size: 19px;
+    font-weight: 700;
+    color: #1a4cb0;
+    border: 2px dashed #1a4cb0;
+    padding: 4px 12px;
+    border-radius: 12px;
+    white-space: nowrap;
+    background: rgba(26,76,176,.05);
+  }
+  .mod-card:hover .open-pill {
+    background: #1a4cb0;
+    color: #fff;
+    border-style: solid;
+  }
+
+  /* Quick Exam Reference Box */
+  .box-dash {
+    border: 2px dashed #2d2d2d;
+    padding: 6px 12px;
+    margin-top: 10px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.35);
+    font-size: 14.5px;
+    line-height: 20px;
+  }
+  .code {
+    color: #2d2d2d;
+    background: rgba(0,0,0,.05);
+    padding: 0 4px;
+    border-radius: 3px;
+  }
+  svg { display:block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: 'Patrick Hand', cursive; fill: #1a4cb0; }
+  svg text.k { fill:#2d2d2d; }
+  svg text.r { fill:#c0392b; font-family:'Caveat',cursive; font-size:16px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#1a4cb0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+</svg>
+
+<!-- ======================= TOP NAVIGATION BAR ======================= -->
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">Claude Prep</span>
+    <span class="brand-title">Handwritten Study Notebook</span>
+  </div>
+
+  <nav class="tabs" id="moduleTabs">
+    <button class="tab-btn active" data-target="index" onclick="selectModule('index')">
+      <span>📑 Binder Index</span>
+    </button>
+    <button class="tab-btn" data-target="m1" onclick="selectModule('m1')">
+      <span class="tab-tag">M1</span><span>MSO Foundations</span>
+    </button>
+    <button class="tab-btn" data-target="m2" onclick="selectModule('m2')">
+      <span class="tab-tag">M2</span><span>Prompting &amp; Agents</span>
+    </button>
+    <button class="tab-btn" data-target="m3" onclick="selectModule('m3')">
+      <span class="tab-tag">M3</span><span>Claude Code &amp; MCP</span>
+    </button>
+    <button class="tab-btn" data-target="m4" onclick="selectModule('m4')">
+      <span class="tab-tag">M4</span><span>Prod Eng, Evals &amp; Security</span>
+    </button>
+    <button class="tab-btn" data-target="m5" onclick="selectModule('m5')">
+      <span class="tab-tag">M5</span><span>Accelerators &amp; IP</span>
+    </button>
+  </nav>
+
+  <div class="controls">
+    <button class="ctrl-btn" id="prevModBtn" onclick="stepModule(-1)" disabled title="Previous Module (←)">← Prev</button>
+    <button class="ctrl-btn" id="nextModBtn" onclick="stepModule(1)" title="Next Module (→)">Next →</button>
+    <button class="ctrl-btn" id="printBtn" onclick="printCurrent()" title="Print / Save PDF">🖨 Print</button>
+    <a class="ctrl-btn" id="openRawLink" href="mso_foundations_notes.html" target="_blank" style="display:none" title="Open standalone HTML in new tab">↗ Standalone</a>
+  </div>
+</header>
+
+<!-- ======================= MAIN VIEW AREA ======================= -->
+<div class="view-container">
+
+  <!-- 1. BINDER COVER / INDEX VIEW -->
+  <div id="indexView">
+    <section class="page">
+      <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+      <div class="tape"></div>
+
+      <h1>Claude Certified Developer — Foundations</h1>
+      <div class="sub">Complete Handwritten Study Binder · All 5 Modules (18 A4 Pages)</div>
+      <svg viewBox="0 0 560 10" style="height:10px;margin-bottom:4px"><g filter="url(#rough)"><path d="M4 5 Q60 1 120 5 T240 5 T360 4 T470 6 T556 3" fill="none" stroke="#2d2d2d" stroke-width="2" stroke-linecap="round"/></g></svg>
+
+      <p>Click any module card below (or use the top tabs / <span class="code">←</span> <span class="code">→</span> arrow keys) to flip through the handwritten study sheets.</p>
+
+      <!-- Arc Diagram -->
+      <svg viewBox="0 0 565 62" style="margin:6px 0 2px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 8 Q52 4 100 9 L101 44 Q52 48 3 43 Z"/>
+          <path d="M118 8 Q166 4 214 9 L215 44 Q166 48 117 43 Z"/>
+          <path d="M232 8 Q280 4 328 9 L329 44 Q280 48 231 43 Z"/>
+          <path d="M346 8 Q394 4 442 9 L443 44 Q394 48 345 43 Z"/>
+          <path d="M460 8 Q510 4 560 9 L561 44 Q510 48 459 43 Z" stroke="#2e8b3d"/>
+          <path d="M103 26 L114 26" marker-end="url(#ah)"/>
+          <path d="M217 26 L228 26" marker-end="url(#ah)"/>
+          <path d="M331 26 L342 26" marker-end="url(#ah)"/>
+          <path d="M445 26 L456 26" marker-end="url(#ah)"/>
+        </g>
+        <g font-size="11.5" text-anchor="middle">
+          <text x="52" y="23" class="k" font-weight="bold">M1 · Foundations</text><text x="52" y="37">Tokens &amp; API</text>
+          <text x="166" y="23" class="k" font-weight="bold">M2 · Agents</text><text x="166" y="37">Prompts &amp; Tools</text>
+          <text x="280" y="23" class="k" font-weight="bold">M3 · Claude Code</text><text x="280" y="37">MCP &amp; Governance</text>
+          <text x="394" y="23" class="k" font-weight="bold">M4 · Prod Eng</text><text x="394" y="37">Evals &amp; Security</text>
+          <text x="510" y="23" class="k" font-weight="bold">M5 · Accelerators</text><text x="510" y="37">Deploy &amp; Reuse</text>
+        </g>
+      </svg>
+
+      <div class="mod-grid">
+        <!-- Module 1 -->
+        <div class="mod-card" onclick="selectModule('m1')">
+          <div>
+            <div class="mod-head">
+              <span class="mod-num">M1</span>
+              <span class="mod-title">MSO Foundations</span>
+              <span class="mod-meta">2 Pages · Foundations</span>
+            </div>
+            <ul class="mod-topics">
+              <li><b class="dk">Tokens &amp; Fixed Context Budget:</b> upfront validation error vs mid-generation <span class="code">model_context_window_exceeded</span>.</li>
+              <li><b class="dk">Sampling &amp; Model Tiers:</b> probability distributions, <span class="hl">Haiku / Sonnet / Opus / Fable</span> ⟂ adaptive thinking (<span class="code">effort</span>).</li>
+              <li><b class="dk">Prompting &amp; Transport:</b> zero/one/multi-shot trade-offs · Sync, Streaming (SSE), Async, Message Batches API (~50% off).</li>
+            </ul>
+          </div>
+          <span class="open-pill">Open Notes →</span>
+        </div>
+
+        <!-- Module 2 -->
+        <div class="mod-card" onclick="selectModule('m2')">
+          <div>
+            <div class="mod-head">
+              <span class="mod-num">M2</span>
+              <span class="mod-title">Production-Grade Prompting, Agents &amp; Tool-use</span>
+              <span class="mod-meta">4 Pages · Core Build</span>
+            </div>
+            <ul class="mod-topics">
+              <li><b class="dk">Prompting &amp; Structured Outputs:</b> failure diagnosis table, <span class="code">json_schema</span>, <span class="code">strict: true</span>, extended thinking carry-back rule.</li>
+              <li><b class="dk">Tool Schemas &amp; Streaming:</b> 4 block types, routing descriptions, SSE <span class="code">input_json_delta</span> buffer, incomplete-stream discard.</li>
+              <li><b class="dk">Long-Context &amp; Agent Loops:</b> lost-in-the-middle, tool-result clearing, compaction, memory tool, checkpoints &amp; human gates.</li>
+            </ul>
+          </div>
+          <span class="open-pill">Open Notes →</span>
+        </div>
+
+        <!-- Module 3 -->
+        <div class="mod-card" onclick="selectModule('m3')">
+          <div>
+            <div class="mod-head">
+              <span class="mod-num">M3</span>
+              <span class="mod-title">Claude Code, MCP &amp; Integration</span>
+              <span class="mod-meta">5 Pages · Team &amp; Tooling</span>
+            </div>
+            <ul class="mod-topics">
+              <li><b class="dk">Permissions &amp; Project Context:</b> <span class="code">plan / default / acceptEdits / auto / dontAsk / bypass</span> · <span class="code">CLAUDE.md</span>, <span class="code">.claude/rules/</span>, hooks, subagents.</li>
+              <li><b class="dk">Packaging Workflows:</b> portable <span class="code">SKILL.md</span> across 4 runtimes, <span class="code">${CLAUDE_PROJECT_DIR}</span>, versioned plugins &amp; marketplaces.</li>
+              <li><b class="dk">MCP Servers &amp; Enterprise Auth:</b> <span class="code">stdio</span> vs Streamable HTTP, Local/User/Project/Enterprise scopes, OAuth vs env-var secrets, caching &amp; RAG.</li>
+            </ul>
+          </div>
+          <span class="open-pill">Open Notes →</span>
+        </div>
+
+        <!-- Module 4 -->
+        <div class="mod-card" onclick="selectModule('m4')">
+          <div>
+            <div class="mod-head">
+              <span class="mod-num">M4</span>
+              <span class="mod-title">Production Engineering, Evals &amp; Security</span>
+              <span class="mod-meta">4 Pages · Production Hardening</span>
+            </div>
+            <ul class="mod-topics">
+              <li><b class="dk">Evals, Testing &amp; Tracing:</b> design doc, exact/code/LLM-as-judge calibration, Unit/Functional/<span class="hl">Integration seam</span>/E2E tests, trace logs.</li>
+              <li><b class="dk">Failure Handling &amp; Cost Budget:</b> retriable (<span class="code">429/5xx</span> backoff + <span class="code">retry-after</span>) vs terminal (<span class="code">4xx</span>), <span class="code">is_error: True</span>, ~15× orchestrator fan-out.</li>
+              <li><b class="dk">Security &amp; Guardrails:</b> indirect prompt injection vs jailbreaks, <span class="code">PreToolUse</span> hook enforcement, least-privilege IAM, audit logs, OS sandboxing.</li>
+            </ul>
+          </div>
+          <span class="open-pill">Open Notes →</span>
+        </div>
+
+        <!-- Module 5 -->
+        <div class="mod-card" onclick="selectModule('m5')">
+          <div>
+            <div class="mod-head">
+              <span class="mod-num">M5</span>
+              <span class="mod-title">Accelerators &amp; IP Contribution</span>
+              <span class="mod-meta">3 Pages · Scale &amp; Deploy</span>
+            </div>
+            <ul class="mod-topics">
+              <li><b class="dk">Accelerators &amp; Contribution Readiness:</b> parameterizing templates/MCP/evals, Cookbook vs tool repo, 5 readiness gates (+ IP/licensing rights).</li>
+              <li><b class="dk">Lifecycle, Platforms &amp; Versioning:</b> functional vs infra requirements, 5-phase lifecycle, 6 platforms, <span class="hlg">pinned full model IDs</span> + rollback retention.</li>
+              <li><b class="dk">Platform Comparison &amp; Trust Boundaries:</b> regional latency, pass/fail residency, <span class="code">treat_as_data(fetched)</span> + <span class="code">least_privilege_read_only</span> on seams.</li>
+            </ul>
+          </div>
+          <span class="open-pill">Open Notes →</span>
+        </div>
+      </div>
+
+      <div class="box-dash">
+        <b class="dk">⚡ Quick Exam Golden Rules Across All 5 Modules:</b>
+        <span class="hl">① Design doc &amp; eval first</span> (anchor judge scales, calibrate against humans) ·
+        <span class="hl">② Never trust fetched content</span> (wrap as data + enforce boundaries with <span class="code">PreToolUse</span> hooks exit code 2, not prompt conventions) ·
+        <span class="hl">③ Pin full model IDs</span> in production &amp; retain prior version for rollback ·
+        <span class="hl">④ Retriable vs Terminal</span> (honor <span class="code">retry-after</span> + exp backoff on 429/5xx, fail fast on 4xx, pass tool errors via <span class="code">is_error: True</span>) ·
+        <span class="hl">⑤ Secrets &amp; Paths</span> (never inline keys in <span class="code">.mcp.json</span> or hardcode local paths in <span class="code">SKILL.md</span> / accelerators).
+      </div>
+    </section>
+  </div>
+
+  <!-- 2. EMBEDDED READER VIEW -->
+  <div id="readerView">
+    <iframe id="readerFrame" title="Study Notes Reader"></iframe>
+  </div>
+
+</div>
+
+<script>
+  const MODULES = {
+    index: { title: 'Binder Index', file: null },
+    m1: { title: 'Module 1 – MSO Foundations', file: 'mso_foundations_notes.html' },
+    m2: { title: 'Module 2 – Prompting, Agents & Tool-use', file: 'production_claude_notes.html' },
+    m3: { title: 'Module 3 – Claude Code, MCP & Integration', file: 'claude_code_mcp_notes.html' },
+    m4: { title: 'Module 4 – Production Engineering, Evals & Security', file: 'production_engineering_evals_security_notes.html' },
+    m5: { title: 'Module 5 – Accelerators & IP Contribution', file: 'accelerators_ip_contribution_notes.html' }
+  };
+  const ORDER = ['index', 'm1', 'm2', 'm3', 'm4', 'm5'];
+  let currentKey = 'index';
+
+  function selectModule(key, updateHash = true) {
+    if (!MODULES[key]) key = 'index';
+    currentKey = key;
+
+    // Update active tab
+    document.querySelectorAll('#moduleTabs .tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.target === key);
+    });
+
+    const indexView = document.getElementById('indexView');
+    const readerView = document.getElementById('readerView');
+    const frame = document.getElementById('readerFrame');
+    const rawLink = document.getElementById('openRawLink');
+
+    if (key === 'index') {
+      indexView.style.display = 'block';
+      readerView.style.display = 'none';
+      rawLink.style.display = 'none';
+    } else {
+      indexView.style.display = 'none';
+      readerView.style.display = 'block';
+      const file = MODULES[key].file;
+      if (frame.getAttribute('data-loaded') !== file) {
+        frame.src = file;
+        frame.setAttribute('data-loaded', file);
+      }
+      rawLink.href = file;
+      rawLink.style.display = 'inline-flex';
+    }
+
+    // Update prev/next buttons
+    const idx = ORDER.indexOf(key);
+    document.getElementById('prevModBtn').disabled = idx <= 0;
+    document.getElementById('nextModBtn').disabled = idx >= ORDER.length - 1;
+
+    if (updateHash) {
+      history.replaceState(null, '', '#' + key);
+    }
+  }
+
+  function stepModule(delta) {
+    const idx = ORDER.indexOf(currentKey);
+    const nextIdx = idx + delta;
+    if (nextIdx >= 0 && nextIdx < ORDER.length) {
+      selectModule(ORDER[nextIdx]);
+    }
+  }
+
+  function printCurrent() {
+    if (currentKey === 'index') {
+      window.print();
+    } else {
+      const frame = document.getElementById('readerFrame');
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+      }
+    }
+  }
+
+  // Keyboard navigation (Left/Right arrows when not inside an input)
+  window.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowLeft') stepModule(-1);
+    if (e.key === 'ArrowRight') stepModule(1);
+    if (e.key === 'Escape') selectModule('index');
+  });
+
+  // Load initial hash if present
+  window.addEventListener('DOMContentLoaded', () => {
+    const hash = (window.location.hash || '').replace('#', '');
+    if (hash && MODULES[hash]) {
+      selectModule(hash, false);
+    }
+  });
+</script>
+
+</body>
+</html>

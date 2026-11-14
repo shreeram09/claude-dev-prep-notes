@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Module 2 – Production-Grade Prompting, Agents & Tool-use (Study Notes)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #d9d7d2;
+    font-family: 'Patrick Hand', 'Caveat', cursive;
+    color: #1a4cb0;
+    font-size: 15.5px;
+    line-height: 22px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    margin: 12px auto;
+    padding: 30px 24px 24px 70px;
+    overflow: hidden;
+    background-color: #fbfaf7;
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 21px, rgba(70,130,215,.30) 21px, rgba(70,130,215,.30) 22px);
+    background-position: 0 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    page-break-after: always;
+    break-after: page;
+  }
+  .page::before {            /* pink margin line */
+    content: ""; position: absolute; top: 0; bottom: 0; left: 56px; width: 2px;
+    background: rgba(232,105,135,.75);
+  }
+  .page::after {             /* faint 2nd margin line */
+    content: ""; position: absolute; top: 0; bottom: 0; left: 60px; width: 1px;
+    background: rgba(232,105,135,.35);
+  }
+  .holes { position:absolute; left:14px; top:0; bottom:0; width:20px; }
+  .holes i { position:absolute; left:0; width:18px; height:18px; border-radius:50%;
+    background:#d9d7d2; box-shadow: inset 1px 2px 3px rgba(0,0,0,.35); }
+  @media print {
+    body { background: none; }
+    .page { margin: 0; box-shadow: none; }
+  }
+  h1, h2, h3 { font-family: 'Caveat', cursive; color: #2d2d2d; margin: 0; font-weight: 700; line-height: 1; }
+  h1 { font-size: 38px; transform: rotate(-.6deg); }
+  h2 { font-size: 29px; margin-top: 10px; transform: rotate(-.4deg); }
+  h3 { font-size: 21px; margin-top: 4px; }
+  p { margin: 0 0 0 0; }
+  ul { margin: 0; padding-left: 20px; list-style: none; }
+  li { position: relative; margin: 0; }
+  li::before { content: "✦"; position: absolute; left: -16px; font-size: 11px; color: #1a4cb0; top: 1px; }
+  .hl { background: linear-gradient(transparent 12%, rgba(255,226,40,.6) 12%, rgba(255,226,40,.6) 92%, transparent 92%); padding: 0 2px; border-radius: 3px; }
+  .hlg { background: linear-gradient(transparent 12%, rgba(120,220,120,.45) 12%, rgba(120,220,120,.45) 92%, transparent 92%); padding: 0 2px; }
+  .hlp { background: linear-gradient(transparent 12%, rgba(255,150,190,.45) 12%, rgba(255,150,190,.45) 92%, transparent 92%); padding: 0 2px; }
+  .dk { color: #2d2d2d; }
+  .row { display: grid; grid-template-columns: 1fr 126px; gap: 12px; margin-top: 4px; }
+  .note {
+    font-family: 'Caveat', cursive; font-size: 17px; line-height: 17px; color: #c0392b;
+    transform: rotate(-2deg); padding: 3px 2px 3px 8px; border-left: 2px dashed #c0392b;
+    align-self: start; margin-top: 4px;
+  }
+  .note.b { transform: rotate(1.8deg); color: #7a3fb0; border-color:#7a3fb0; }
+  .box {
+    border: 2px solid #2d2d2d; padding: 4px 10px; margin: 6px 0;
+    border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px;
+    background: rgba(255,255,255,.25);
+  }
+  .box.dash { border-style: dashed; }
+  .box.red { border-color: #c0392b; }
+  .code { font-family: 'Patrick Hand', cursive; color: #2d2d2d; background: rgba(0,0,0,.04); padding: 0 4px; border-radius: 3px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+  .box.sm { padding: 2px 8px; margin: 3px 0; line-height: 20px; }
+  .title-wrap { margin-bottom: 2px; }
+  .sub { font-family:'Caveat',cursive; font-size: 19px; color:#c0392b; line-height: 22px; }
+  svg { display:block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: 'Patrick Hand', cursive; fill: #1a4cb0; }
+  svg text.k { fill:#2d2d2d; }
+  svg text.r { fill:#c0392b; font-family:'Caveat',cursive; font-size:16px; }
+  .pn { position:absolute; bottom: 8px; right: 30px; font-family:'Caveat',cursive; font-size:17px; color:#777; }
+  .tape { position:absolute; top:-6px; right:60px; width:90px; height:24px; background: rgba(255,225,120,.55); transform: rotate(4deg); border-left:2px dotted rgba(0,0,0,.15); border-right:2px dotted rgba(0,0,0,.15);}
+</style>
+</head>
+<body>
+
+<!-- shared hand-drawn wobble filter -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#1a4cb0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+</svg>
+
+<!-- ======================= PAGE 1 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+  <div class="tape"></div>
+
+  <div class="title-wrap">
+    <h1>Production-Grade Prompting, Agents &amp; Tool-use</h1>
+    <div class="sub">Module 2 · turning a Claude <u>prototype</u> into a system that survives <u>production</u></div>
+    <svg viewBox="0 0 560 10" style="height:10px"><g filter="url(#rough)"><path d="M4 5 Q60 1 120 5 T240 5 T360 4 T470 6 T556 3" fill="none" stroke="#2d2d2d" stroke-width="2" stroke-linecap="round"/></g></svg>
+  </div>
+  <p>Core idea: dev works on <i>small inputs, short sessions</i>. Prod has <span class="hl">big tool outputs, long sessions, dropped streams, irreversible actions</span>. Each topic = one hidden failure mode.</p>
+
+  <h2>1 · Prompting craft</h2>
+  <div class="row">
+    <div>
+      <p><span class="hl">Don't just add words.</span> Diagnose the <b>failure type</b> → add the ONE missing technique.</p>
+      <svg viewBox="0 0 565 172">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <g>
+            <path d="M6 9 Q110 5 214 9 L216 39 Q110 42 5 38 Z"/><path d="M330 9 Q445 5 560 8 L561 40 Q445 43 331 38 Z"/>
+            <path d="M222 24 Q272 20 322 25 M312 17 L323 25 L311 33"/>
+          </g>
+          <g transform="translate(0,42)">
+            <path d="M6 9 Q110 6 214 8 L216 40 Q110 41 5 38 Z"/><path d="M330 8 Q445 6 560 9 L561 39 Q445 42 331 40 Z"/>
+            <path d="M222 24 Q272 21 322 24 M312 16 L323 24 L311 32"/>
+          </g>
+          <g transform="translate(0,84)">
+            <path d="M6 8 Q110 5 214 9 L216 38 Q110 42 5 39 Z"/><path d="M330 9 Q445 4 560 8 L561 40 Q445 42 331 37 Z"/>
+            <path d="M222 24 Q272 19 322 25 M312 17 L323 25 L311 33"/>
+          </g>
+          <g transform="translate(0,126)">
+            <path d="M6 9 Q110 6 214 8 L216 39 Q110 43 5 38 Z"/><path d="M330 8 Q445 5 560 9 L561 41 Q445 42 331 39 Z"/>
+            <path d="M222 24 Q272 22 322 24 M312 16 L323 24 L311 32"/>
+          </g>
+        </g>
+        <g font-size="14.5" text-anchor="middle">
+          <text x="110" y="29">wrong SHAPE (prose, not JSON)</text><text x="445" y="29" class="k" font-weight="bold">output constraint</text>
+          <text x="110" y="71">content / scope DRIFTS over turns</text><text x="445" y="71" class="k">system prompt (behaviour contract)</text>
+          <text x="110" y="113">right task, INVENTED structure</text><text x="445" y="113" class="k">few-shot examples</text>
+          <text x="110" y="155">breaks on an EDGE-case input</text><text x="445" y="155" class="k">constraint / example for the variant</text>
+        </g>
+      </svg>
+      <p><b class="dk">XML tags</b> = separate instructions from data (<span class="code">&lt;ticket&gt;</span>, <span class="code">&lt;sample_input&gt;</span>). <b class="dk">Few-shot</b> = <i>show</i>, don't tell.</p>
+    </div>
+    <div class="note">Re-prompted 3× and still broken? STOP adding text — diagnose!<br>Long prompt → long, slow output (6-pass trace: no accuracy gain)</div>
+  </div>
+
+  <div class="box">
+    <b class="dk">Classifier fix:</b> “Classify into exactly one of: <span class="hl">BILLING, TECHNICAL, ESCALATION. Return only the label. No other text.</span>” + 2 few-shot pairs → parser-safe output every time.
+  </div>
+
+  <div class="row">
+    <div>
+      <h3>Structured outputs (move control INTO the API)</h3>
+      <ul>
+        <li><b class="dk">JSON outputs</b> – <span class="code">output_config.format = json_schema</span> → constrained decoding, valid JSON every time.</li>
+        <li><b class="dk">Strict tool use</b> – <span class="code">strict: true</span> → tool args validated against schema.</li>
+        <li><span class="hlp">Costs:</span> 1st call slower (grammar compile, cached 24h) · extra input tokens · still check <span class="code">stop_reason</span> (<i>refusal</i>, <i>max_tokens</i> = bad output) · ✗ can't combine with prefill.</li>
+      </ul>
+    </div>
+    <div class="note b">schema ≠ guaranteed success!<br>always check stop_reason</div>
+  </div>
+
+  <h2>2 · Extended thinking</h2>
+  <div class="row">
+    <div>
+      <p>Model reasons first (a <span class="code">thinking</span> block precedes the answer). Adaptive on current models → tune with <span class="hl">effort</span>, not old <span class="code">budget_tokens</span> (deprecated → 400 error). Thinking tokens cost like output tokens.</p>
+      <div class="grid3" style="margin-top:4px">
+        <div class="box sm" style="border-color:#2e8b3d"><b class="dk">ON ✔</b><br>multi-step logic, math, planning dependent steps</div>
+        <div class="box sm" style="border-color:#c0392b"><b class="dk">OFF ✘</b><br>classify, extract, format, lookups (constraint prompt is enough)</div>
+        <div class="box sm" style="border-color:#7a3fb0"><b class="dk">Agents</b><br>enable; budget for the <i>planning</i> step</div>
+      </div>
+    </div>
+    <div class="note">Sonnet 50k-ticket overnight job? thinking OFF.</div>
+  </div>
+  <div class="box red"><b class="dk">⚠ Carry-back rule:</b> with tools + thinking, return every <span class="code">thinking</span> block (even redacted) to the API <span class="hl">UNCHANGED</span>. Edit / summarise / drop → signature breaks → request rejected. Worried about context? use context engineering, don't strip.</div>
+  <div class="pn">— 1 —</div>
+</section>
+
+<!-- ======================= PAGE 2 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">3 · Tool use &amp; schema design</h2>
+  <div class="row">
+    <div>
+      <p><span class="hl">Claude never runs tools.</span> It <i>asks</i>; your code executes &amp; returns the result. Most bugs live at this boundary.</p>
+      <svg viewBox="0 0 565 222" style="margin-top:4px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 12 Q120 8 232 12 L234 70 Q120 74 9 69 Z"/>
+          <path d="M333 11 Q445 7 556 12 L557 71 Q445 74 334 69 Z"/>
+          <path d="M334 152 Q445 148 557 153 L556 211 Q445 214 333 210 Z"/>
+          <path d="M9 151 Q120 148 233 152 L234 210 Q120 213 10 211 Z"/>
+          <path d="M238 40 Q285 36 328 41" marker-end="url(#ah)"/>
+          <path d="M446 76 Q450 112 445 146" marker-end="url(#ah)"/>
+          <path d="M328 182 Q285 186 240 181" marker-end="url(#ah)"/>
+          <path d="M120 146 Q116 110 121 78" marker-end="url(#ah)"/>
+          <ellipse cx="282" cy="111" rx="62" ry="30" stroke="#c0392b" stroke-dasharray="5 4"/>
+        </g>
+        <g font-size="14" text-anchor="middle">
+          <text x="121" y="31" class="k" font-weight="bold">① YOU send</text><text x="121" y="50">tools[] schema + messages</text>
+          <text x="445" y="31" class="k" font-weight="bold">② CLAUDE replies</text><text x="445" y="50">tool_use {name, id, input}</text>
+          <text x="445" y="172" class="k" font-weight="bold">③ YOUR code runs</text><text x="445" y="191">the actual function</text>
+          <text x="121" y="172" class="k" font-weight="bold">④ YOU return</text><text x="121" y="191">tool_result {tool_use_id}</text>
+          <text x="282" y="106" class="r" text-anchor="middle">stop_reason</text>
+          <text x="282" y="123" font-size="12.5" text-anchor="middle">tool_use → loop · end_turn → done</text>
+        </g>
+      </svg>
+    </div>
+    <div class="note">Every tool_use needs a tool_result with the SAME id in the very next user turn — or 400 error.</div>
+  </div>
+
+  <div class="row">
+    <div>
+      <h3>4 block types</h3>
+      <ul>
+        <li><b class="dk">text</b> – keep it in history when it sits beside a tool_use (don't drop!)</li>
+        <li><b class="dk">tool_use</b> – name + unique id + input (assistant)</li>
+        <li><b class="dk">tool_result</b> – matching id, content, optional <span class="code">is_error</span> (sent as <i>user</i> role; all results for a turn go in ONE message)</li>
+        <li><b class="dk">thinking</b> – return unchanged (see carry-back)</li>
+      </ul>
+    </div>
+    <div class="note b">Checkpoint 3: result had toolu_02 but call was toolu_01 → fix the ID.</div>
+  </div>
+
+  <h3>Schema anatomy = name + description + input_schema</h3>
+  <div class="box">
+    <span class="hl">Description is what Claude routes on.</span> Write 3–4 sentences: <b class="dk">what it does · when to use · when NOT to use · what it returns.</b><br>
+    ✘ “Use this to find information.” &nbsp; ✔ “…current balance for an account ID. Do NOT use for transaction history.”
+  </div>
+  <div class="row">
+    <div>
+      <ul>
+        <li><b class="dk">required</b> only if the call is meaningless without it (else Claude fabricates values)</li>
+        <li><b class="dk">optional</b> for sensible defaults / absence is meaningful</li>
+        <li><b class="dk">dependent</b> calls → separate turns · <b class="dk">independent</b> → parallel tool_use blocks (<span class="code">disable_parallel_tool_use</span> to force one)</li>
+        <li>Overlapping params → name the domain/trigger in each description. Can't separate? <span class="hlg">merge into one tool w/ a type param.</span></li>
+        <li><span class="hlp">Over-tooling</span> degrades routing → start with the minimum set.</li>
+      </ul>
+    </div>
+    <div class="note">search_docs vs get_context_summary: both said “find info” → add an exclusion sentence to BOTH.</div>
+  </div>
+
+  <h2>MCP – use someone else's tools</h2>
+  <div class="row">
+    <div>
+      <svg viewBox="0 0 565 100">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 22 Q70 18 132 22 L133 64 Q70 68 7 63 Z"/>
+          <path d="M215 20 Q280 16 345 21 L346 66 Q280 70 214 64 Z"/>
+          <path d="M432 22 Q495 18 557 23 L556 64 Q495 68 433 63 Z"/>
+          <path d="M138 36 Q175 32 210 37" marker-end="url(#ah)"/><path d="M210 52 Q175 56 138 51" marker-end="url(#ah)"/>
+          <path d="M350 36 Q390 32 428 37" marker-end="url(#ah)"/><path d="M428 52 Q390 56 350 51" marker-end="url(#ah)"/>
+        </g>
+        <g font-size="14" text-anchor="middle">
+          <text x="70" y="40" class="k">Your app</text><text x="70" y="57" font-size="12.5">(MCP client)</text>
+          <text x="280" y="40" class="k">MCP server</text><text x="280" y="57" font-size="12.5">tool defs + execution</text>
+          <text x="495" y="40" class="k">GitHub / SaaS</text><text x="495" y="57" font-size="12.5">real API</text>
+          <text x="173" y="86" class="r">ListTools</text><text x="390" y="86" class="r">tool calls</text>
+        </g>
+      </svg>
+      <ul>
+        <li>Loop is unchanged; only <i>who wrote the schemas</i> changes.</li>
+        <li><span class="hlp">Every connected server's tool defs eat context</span> even when unused → <span class="code">enabled</span> / <span class="code">defer_loading</span> in <span class="code">mcp_toolset</span> (needs beta header <span class="code">mcp-client-2025-11-20</span>).</li>
+        <li>Transports: <b class="dk">stdio</b> (local subprocess) · <b class="dk">Streamable HTTP</b> (remote; SSE-only deprecated). API connector = remote HTTP only.</li>
+        <li><b class="dk">Use MCP</b> if maintained server exists · <b class="dk">manual</b> for description quality · <b class="dk">both</b>: allowlist + tune descriptions.</li>
+      </ul>
+    </div>
+    <div class="note b">Narrow the tool set AND sharpen descriptions — two separate levers.</div>
+  </div>
+  <div class="pn">— 2 —</div>
+</section>
+
+<!-- ======================= PAGE 3 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">4 · Streaming</h2>
+  <div class="row">
+    <div>
+      <p>API sends <i>events</i>; <span class="hl">you assemble the blocks.</span> Final message = same as non-streamed.</p>
+      <svg viewBox="0 0 565 188" style="margin-top:2px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 8 Q45 5 88 9 L89 44 Q45 47 3 43 Z"/>
+          <path d="M97 9 Q140 5 183 8 L184 45 Q140 47 98 43 Z"/>
+          <path d="M192 8 Q235 6 278 9 L279 44 Q235 48 193 43 Z"/>
+          <path d="M287 9 Q330 5 373 8 L374 45 Q330 47 288 44 Z"/>
+          <path d="M382 8 Q425 6 468 9 L469 44 Q425 47 383 43 Z"/>
+          <path d="M477 9 Q520 5 562 8 L563 44 Q520 48 478 43 Z" stroke="#2e8b3d"/>
+          <path d="M90 27 L96 27 M185 27 L191 27 M280 27 L286 27 M375 27 L381 27 M470 27 L476 27"/>
+          <path d="M330 52 Q332 70 329 84" stroke="#c0392b" marker-end="url(#ah)"/>
+          <path d="M520 52 Q522 70 519 84" stroke="#2e8b3d" marker-end="url(#ah)"/>
+          <path d="M235 52 Q236 70 235 84" marker-end="url(#ah)"/>
+          <path d="M425 52 Q426 70 424 84" marker-end="url(#ah)"/>
+          <path d="M20 128 Q150 122 300 130 Q420 134 545 126" stroke="#c0392b" stroke-dasharray="3 5"/>
+          <path d="M300 118 L312 142 M312 118 L300 142" stroke="#c0392b" stroke-width="3"/>
+        </g>
+        <g font-size="11.5" text-anchor="middle">
+          <text x="46" y="30" class="k">message_start</text>
+          <text x="140" y="23" class="k">content_block</text><text x="140" y="36" class="k">_start</text>
+          <text x="235" y="23" class="k">content_block</text><text x="235" y="36" class="k">_delta ×n</text>
+          <text x="330" y="23" class="k">content_block</text><text x="330" y="36" class="k">_stop</text>
+          <text x="425" y="30" class="k">message_delta</text>
+          <text x="520" y="30" class="k">message_stop</text>
+        </g>
+        <g font-size="12.5" text-anchor="middle">
+          <text x="235" y="100">append fragment</text><text x="235" y="113" class="r">(partial JSON!)</text>
+          <text x="330" y="100" font-weight="bold">parse/run tool</text><text x="330" y="113">ONLY now</text>
+          <text x="425" y="100">save stop_reason</text>
+          <text x="520" y="100" font-weight="bold">commit turn to</text><text x="520" y="113">history ONLY now</text>
+          <text x="282" y="163" class="r" style="font-size:17px">stream drops before message_stop → DISCARD partial turn, retry!</text>
+          <text x="282" y="181" font-size="12.5">half-built tool_use in history = failure shows up on the NEXT request</text>
+        </g>
+      </svg>
+    </div>
+    <div class="note">“Read loop ended” ≠ “message complete”. Track a <span style="text-decoration:underline">stop_seen</span> flag.</div>
+  </div>
+  <div class="box sm"><b class="dk">Use streaming</b> for user-facing long output. <b class="dk">Skip</b> for short / backend jobs (no partial-state risk).</div>
+
+  <h2>5 · Context engineering</h2>
+  <div class="row">
+    <div>
+      <p>Window = fixed budget: system + history + tool defs + <span class="hlp">every tool result</span> + output. Too big → API error / <span class="code">model_context_window_exceeded</span>; nothing is silently truncated, <i>you</i> must manage it.</p>
+      <p><b class="dk">Model pick:</b> start <span class="hl">Sonnet</span> → Opus only if evals say so → Haiku only if quality loss is acceptable (measured!).</p>
+      <svg viewBox="0 0 565 150" style="margin-top:2px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 22 Q280 17 540 22 L541 62 Q280 67 7 61 Z"/>
+          <path d="M46 24 L45 60 M120 23 L121 60"/>
+          <path d="M126 27 L160 58 M140 25 L170 58 M158 25 L186 58 M176 25 L206 58 M196 25 L226 58 M216 25 L246 58 M236 25 L266 58 M256 25 L286 58 M276 25 L306 58 M296 25 L326 58 M316 25 L346 58 M336 25 L366 58 M356 25 L386 58 M376 25 L406 58 M396 25 L426 58 M416 25 L446 58 M436 25 L466 58" stroke-width="1" stroke="#7a9ad6"/>
+          <path d="M468 8 L467 78" stroke="#c0392b" stroke-width="3"/>
+          <path d="M20 110 Q150 106 270 112 M300 110 Q420 106 520 112"/>
+        </g>
+        <g font-size="12.5" text-anchor="middle">
+          <text x="27" y="46" font-size="10.5">sys</text><text x="83" y="46">history</text>
+          <text x="300" y="46" class="k">tool results (never pruned!)</text>
+          <text x="467" y="92" class="r">40k cap</text>
+          <text x="150" y="103">dev: ~800 tok/call ✔</text>
+          <text x="410" y="103">prod: ~3,200 tok/call → cap at turn 8 ✘</text>
+          <text x="282" y="140" class="r" style="font-size:16px">symptom looks like WRONG TOOL selection – check the window first!</text>
+        </g>
+      </svg>
+    </div>
+    <div class="note">Measure tokens on your LARGEST real input, not fixtures.</div>
+  </div>
+
+  <h3>4 strategies</h3>
+  <div class="grid4">
+    <div class="box sm"><b class="dk">Prune</b> – rewind to earlier msg, drop dead-end path. <i>Lose:</i> what was learned after.</div>
+    <div class="box sm"><b class="dk">Compact</b> – summarise history (/compact; API server-side compaction beta). <i>Lose:</i> un-summarised detail.</div>
+    <div class="box sm"><b class="dk">Clear</b> – new session, empty context, for unrelated task. <i>Lose:</i> all (persist in CLAUDE.md/storage).</div>
+    <div class="box sm"><b class="dk">Subagent</b> – isolated window, scoped task, returns short summary. <i>Lose:</i> its reasoning trail.</div>
+  </div>
+  <div class="row">
+    <div>
+      <ul>
+        <li><b class="dk">Summarizer prompt matters:</b> “summarise” ✘ vs “keep file paths changed, decisions, errors + fixes” ✔</li>
+        <li><b class="dk">Prompt caching</b> – <span class="code">cache_control: ephemeral</span> on stable prefix (system, tools, docs), ≤4 breakpoints → cheaper turns.</li>
+        <li><b class="dk">count_tokens</b> – measure before sending; gate oversize requests.</li>
+        <li><b class="dk">RAG breaks at:</b> chunking (size + overlap) · embedding match (misses exact IDs → add lexical) · prompt assembly.</li>
+      </ul>
+    </div>
+    <div class="note b">Subagents start clean: no history, no skills (permissions DO carry over).</div>
+  </div>
+  <div class="pn">— 3 —</div>
+</section>
+
+<!-- ======================= PAGE 4 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">6 · Building a production agent</h2>
+  <div class="row">
+    <div>
+      <p>Agent = multi-step tool loop + managed context + a goal. <span class="hl">Choose the simplest pattern that works</span> – move up only when it can't cope.</p>
+      <svg viewBox="0 0 565 160" style="margin-top:2px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 152 L8 118 Q80 114 150 119 L150 152" />
+          <path d="M150 119 L150 80 Q230 76 305 81 L305 152"/>
+          <path d="M305 81 L305 38 Q425 33 556 39 L556 152"/>
+          <path d="M20 152 Q280 156 545 151"/>
+          <path d="M320 24 Q430 6 520 12" stroke="#c0392b" marker-end="url(#ah)"/>
+        </g>
+        <g font-size="13.5" text-anchor="middle">
+          <text x="79" y="140" class="k" font-weight="bold">① single call</text>
+          <text x="228" y="108" class="k" font-weight="bold">② workflow</text><text x="228" y="125" font-size="12">steps enumerated in code</text><text x="228" y="140" font-size="12">same sequence each run</text>
+          <text x="430" y="62" class="k" font-weight="bold">③ AGENT</text><text x="430" y="79" font-size="12.5">goal + tools, path unknown</text><text x="430" y="94" font-size="12.5">inputs vary, creative sequencing</text><text x="430" y="109" font-size="12.5">non-determinism acceptable</text>
+          <text x="420" y="12" class="r">only if simpler fails</text>
+        </g>
+      </svg>
+    </div>
+    <div class="note">Workflow: error cost high, step guardrails, standard observability.<br>Agent: needs transcript-level tooling.</div>
+  </div>
+
+  <h3>3 wiring paths – who runs the loop?</h3>
+  <div class="grid3">
+    <div class="box sm"><b class="dk">Raw Messages API</b><br>You own EVERYTHING: loop, tools, context, retries, exit.<br><i>Max control, max upkeep.</i></div>
+    <div class="box sm"><b class="dk">Agent SDK</b><br>Loop runs in YOUR process; you execute tools.<br><span class="hlp">set settingSources explicitly</span> (CLAUDE.md/skills).</div>
+    <div class="box sm"><b class="dk">Managed Agents</b> (beta)<br>Anthropic runs loop + sandbox; you stream events. Long runs. Beta header <span class="code">managed-agents-2026-04-01</span>.</div>
+  </div>
+  <div class="box red sm"><b class="dk">Deal-breaker:</b> Managed Agent sessions are stored server-side → <span class="hl">not eligible for ZDR or HIPAA BAA</span>. PHI/ZDR → Agent SDK or raw loop on a covered config. <i>Constraint picks the path, not convenience.</i></div>
+
+  <div class="row">
+    <div>
+      <h3>The loop — 4 steps (any path)</h3>
+      <svg viewBox="0 0 565 78">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12 Q70 8 133 12 L134 52 Q70 56 4 51 Z"/><path d="M148 11 Q212 8 276 12 L277 53 Q212 56 147 51 Z"/>
+          <path d="M291 12 Q355 8 419 11 L420 52 Q355 56 290 51 Z"/><path d="M433 11 Q497 8 560 12 L561 53 Q497 56 432 51 Z"/>
+          <path d="M136 31 L145 31 M279 31 L288 31 M422 31 L430 31"/>
+        </g>
+        <g font-size="12.5" text-anchor="middle">
+          <text x="69" y="29" class="k">① register</text><text x="69" y="44">tools</text>
+          <text x="212" y="29" class="k">② scoped</text><text x="212" y="44">system prompt</text>
+          <text x="355" y="29" class="k">③ run tool-use</text><text x="355" y="44">loop (ALL results)</text>
+          <text x="497" y="29" class="k">④ exit</text><text x="497" y="44">conditions</text>
+          <text x="282" y="72" class="r">+ ⑤ a HITL checkpoint somewhere in it</text>
+        </g>
+      </svg>
+    </div>
+    <div class="note b">Exit must not rely on Claude “volunteering” to stop.</div>
+  </div>
+
+  <h3>HITL — ask: “worst outcome if this step runs unchecked?”</h3>
+  <div class="grid3">
+    <div class="box sm"><b class="dk">Before destructive call</b><br>write / delete / send. <span class="hlp">HIGH</span> – irreversible.</div>
+    <div class="box sm"><b class="dk">After planning step</b><br>wrong plan = wrong result. <span class="hl">MEDIUM</span></div>
+    <div class="box sm"><b class="dk">On unexpected output</b><br>error flag, empty, out-of-bounds. <span class="hlg">VARIES</span></div>
+  </div>
+  <div class="box dash">
+    <b class="dk">Postmortem:</b> config-agent edited a customer rate-limit; <span class="code">validate_config</span> passed (value in range) → app throttled. Validation checked the <i>file</i>, not <i>downstream dependants</i>. Fix: gate between “change proposed” and “write committed”.
+<pre style="margin:2px 0 0;font-family:'Patrick Hand',cursive;font-size:14.5px;line-height:19px;color:#2d2d2d">if block.name == "update_record" and not request_human_approval(block.input):
+    result = "Update cancelled by reviewer."
+else:
+    result = execute_tool(block.name, block.input)</pre>
+  </div>
+
+  <h3>Regulated data → decides endpoint + creds <u>first</u></h3>
+  <div class="grid2" style="gap:4px 10px">
+    <div class="box sm"><b class="dk">Privilege</b>: approved gateway, SSO, app-layer logging.</div>
+    <div class="box sm"><b class="dk">HIPAA</b>: BAA-covered config only (not Console/beta/consumer).</div>
+    <div class="box sm"><b class="dk">GDPR/residency</b>: Bedrock/Vertex w/ region pinned (direct API: no EU residency).</div>
+    <div class="box sm"><b class="dk">FedRAMP</b>: C4G, Bedrock GovCloud, Vertex Assured Workloads.</div>
+  </div>
+  <div class="pn">— 4 —</div>
+</section>
+
+<!-- ======================= PAGE 5 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">7 · Agent memory &amp; Skills</h2>
+  <div class="row">
+    <div>
+      <p><span class="hl">Decide memory scope at DESIGN time</span> — refactoring under prod pressure costs far more.</p>
+      <svg viewBox="0 0 565 150" style="margin-top:2px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 8 Q140 4 276 9 L277 70 Q140 74 5 69 Z"/><path d="M290 9 Q425 5 559 8 L560 70 Q425 74 289 69 Z"/>
+          <path d="M6 82 Q140 79 276 83 L277 143 Q140 147 5 142 Z"/><path d="M290 83 Q425 79 559 82 L560 144 Q425 147 289 142 Z"/>
+        </g>
+        <g font-size="13" text-anchor="middle">
+          <text x="141" y="26" class="k" font-weight="bold">In-context</text><text x="141" y="43">short, single session; cost ↑ every turn</text><text x="141" y="58">lost on session end</text>
+          <text x="425" y="26" class="k" font-weight="bold">External storage</text><text x="425" y="43">survives sessions / users / agents</text><text x="425" y="58">+ latency &amp; read/write code</text>
+          <text x="141" y="100" class="k" font-weight="bold">Summarised</text><text x="141" y="117">cheaper than full replay</text><text x="141" y="132">loses what summarizer skipped</text>
+          <text x="425" y="100" class="k" font-weight="bold">Stateless</text><text x="425" y="117">one-shot jobs, each independent</text><text x="425" y="132">no prior context at all</text>
+        </g>
+      </svg>
+    </div>
+    <div class="note">Dev = 1 long session. Prod = many short ones with piling state (45k tokens before turn 1!)</div>
+  </div>
+
+  <div class="box">
+    <b class="dk">Skill (SKILL.md)</b> = reusable instructions loaded <span class="hl">on demand</span> (name+description always visible; body loads only on match).
+    vs <b class="dk">CLAUDE.md</b> = always loaded (fixed cost) · <b class="dk">in-context</b> = grows w/ session.
+    API: beta headers <span class="code">code-execution-2025-08-25</span> + <span class="code">skills-2025-10-02</span> (runs in code-exec container). Subagents must be given skills explicitly.
+  </div>
+
+  <h2>8 · Images, PDFs &amp; batch</h2>
+  <div class="row">
+    <div>
+      <svg viewBox="0 0 565 130">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 8 Q90 5 172 9 L173 112 Q90 116 7 111 Z"/>
+          <path d="M36 8 L35 111 M64 7 L65 112 M92 7 L91 111 M120 8 L121 112 M148 8 L149 111" stroke-width="1" stroke="#7a9ad6"/>
+          <path d="M8 36 L172 35 M7 64 L173 65 M8 92 L172 91" stroke-width="1" stroke="#7a9ad6"/>
+          <path d="M8 8 L36 8 L36 36 L8 36 Z" stroke="#c0392b"/>
+          <path d="M200 20 Q360 14 545 21 L546 82 Q360 88 199 81 Z" stroke="#2d2d2d"/>
+        </g>
+        <g font-size="13.5">
+          <text x="14" y="126" class="r">1 patch = 28×28 px = 1 token</text>
+          <text x="372" y="45" text-anchor="middle" class="k" style="font-size:18px">⌈w/28⌉ × ⌈h/28⌉ tokens</text>
+          <text x="372" y="66" text-anchor="middle">1000×1000 → 36×36 ≈ 1,296 tok</text>
+          <text x="372" y="108" text-anchor="middle" class="r">over per-model limit? it gets downscaled first</text>
+        </g>
+      </svg>
+      <ul>
+        <li><b class="dk">Inline base64</b> – one-off image · <b class="dk">URL</b> – stable &amp; public only · <b class="dk">Files API</b> – upload once, reuse <span class="code">file_id</span> (beta; not on Bedrock/Vertex).</li>
+        <li><b class="dk">PDF</b> → <span class="code">document</span> block (same 3 sources; optional title/context).</li>
+        <li>Ambiguity in images: tell Claude how to handle overlap/occlusion.</li>
+      </ul>
+    </div>
+    <div class="note">Resize before ingest = 10-min fix. Calc on the LARGEST prod image.</div>
+  </div>
+
+  <div class="row">
+    <div>
+      <h3>Message Batches API</h3>
+      <svg viewBox="0 0 565 70">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 10 Q70 6 135 10 L136 50 Q70 54 4 49 Z"/><path d="M175 9 Q230 6 285 10 L286 50 Q230 53 174 49 Z"/>
+          <path d="M325 10 Q370 6 415 9 L416 49 Q370 53 324 48 Z"/><path d="M455 9 Q505 5 559 10 L560 50 Q505 54 454 48 Z"/>
+          <path d="M139 30 Q155 26 172 31" marker-end="url(#ah)"/><path d="M289 30 Q305 26 322 30" marker-end="url(#ah)"/><path d="M419 29 Q435 26 452 30" marker-end="url(#ah)"/>
+        </g>
+        <g font-size="12" text-anchor="middle">
+          <text x="70" y="27" class="k">≤100k reqs / 256MB</text><text x="70" y="42">each has custom_id</text>
+          <text x="230" y="33">→ batch_id</text><text x="370" y="33">poll (≤24h)</text>
+          <text x="507" y="27" class="k">results</text><text x="507" y="42" class="r" style="font-size:14px">ANY order!</text>
+        </g>
+      </svg>
+      <p>Cheaper per token, async. ✔ nightly 5,000 classify, eval runs. ✘ anything a user waits on. <span class="hlp">Looping sync calls in chunks ≠ batching</span> → still rate-limited.</p>
+    </div>
+    <div class="note b">Match results via custom_id, never by position.</div>
+  </div>
+
+  <h3>Cheat-sheet: the 8 takeaways</h3>
+  <div class="box dash" style="line-height:20px;font-size:14.5px;padding:4px 12px">
+    ① wrong output → name the failure, add 1 technique (+ structured outputs) · ② thinking only where it changes the answer; return blocks unchanged · ③ stream end ≠ message_stop · ④ wrong tool = fix the <i>description</i> (add “don't use when…”) · ⑤ tool outputs burn context fastest → prune / compact / subagent · ⑥ workflow vs agent first; HITL before irreversible tools · ⑦ memory scope by session shape; Skills for on-demand instructions · ⑧ compute image tokens up front; Files API for reuse; Batches for offline.
+  </div>
+  <div class="pn">— 5 —</div>
+</section>
+
+</body>
+</html>

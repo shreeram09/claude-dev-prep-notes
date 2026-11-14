@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Module 4 – Production Engineering, Evals & Security (Study Notes)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #d9d7d2;
+    font-family: 'Patrick Hand', 'Caveat', cursive;
+    color: #1a4cb0;
+    font-size: 15.5px;
+    line-height: 22px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    margin: 12px auto;
+    padding: 30px 24px 24px 70px;
+    overflow: hidden;
+    background-color: #fbfaf7;
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 21px, rgba(70,130,215,.30) 21px, rgba(70,130,215,.30) 22px);
+    background-position: 0 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    page-break-after: always;
+    break-after: page;
+  }
+  .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: 56px; width: 2px; background: rgba(232,105,135,.75); }
+  .page::after { content: ""; position: absolute; top: 0; bottom: 0; left: 60px; width: 1px; background: rgba(232,105,135,.35); }
+  .holes { position:absolute; left:14px; top:0; bottom:0; width:20px; }
+  .holes i { position:absolute; left:0; width:18px; height:18px; border-radius:50%; background:#d9d7d2; box-shadow: inset 1px 2px 3px rgba(0,0,0,.35); }
+  @media print { body { background: none; } .page { margin: 0; box-shadow: none; } }
+  h1, h2, h3 { font-family: 'Caveat', cursive; color: #2d2d2d; margin: 0; font-weight: 700; line-height: 1; }
+  h1 { font-size: 38px; transform: rotate(-.6deg); }
+  h2 { font-size: 29px; margin-top: 10px; transform: rotate(-.4deg); }
+  h3 { font-size: 21px; margin-top: 4px; }
+  p { margin: 0; }
+  ul { margin: 0; padding-left: 20px; list-style: none; }
+  li { position: relative; margin: 0; }
+  li::before { content: "✦"; position: absolute; left: -16px; font-size: 11px; color: #1a4cb0; top: 1px; }
+  .hl { background: linear-gradient(transparent 12%, rgba(255,226,40,.6) 12%, rgba(255,226,40,.6) 92%, transparent 92%); padding: 0 2px; border-radius: 3px; }
+  .hlg { background: linear-gradient(transparent 12%, rgba(120,220,120,.45) 12%, rgba(120,220,120,.45) 92%, transparent 92%); padding: 0 2px; }
+  .hlp { background: linear-gradient(transparent 12%, rgba(255,150,190,.45) 12%, rgba(255,150,190,.45) 92%, transparent 92%); padding: 0 2px; }
+  .dk { color: #2d2d2d; }
+  .row { display: grid; grid-template-columns: 1fr 126px; gap: 12px; margin-top: 4px; }
+  .note { font-family: 'Caveat', cursive; font-size: 17px; line-height: 17px; color: #c0392b; transform: rotate(-2deg); padding: 3px 2px 3px 8px; border-left: 2px dashed #c0392b; align-self: start; margin-top: 4px; }
+  .note.b { transform: rotate(1.8deg); color: #7a3fb0; border-color:#7a3fb0; }
+  .box { border: 2px solid #2d2d2d; padding: 4px 10px; margin: 6px 0; border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px; background: rgba(255,255,255,.25); }
+  .box.dash { border-style: dashed; }
+  .box.red { border-color: #c0392b; }
+  .code { font-family: 'Patrick Hand', cursive; color: #2d2d2d; background: rgba(0,0,0,.04); padding: 0 4px; border-radius: 3px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+  .box.sm { padding: 2px 8px; margin: 3px 0; line-height: 20px; }
+  .title-wrap { margin-bottom: 2px; }
+  .sub { font-family:'Caveat',cursive; font-size: 19px; color:#c0392b; line-height: 22px; }
+  svg { display:block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: 'Patrick Hand', cursive; fill: #1a4cb0; }
+  svg text.k { fill:#2d2d2d; }
+  svg text.r { fill:#c0392b; font-family:'Caveat',cursive; font-size:16px; }
+  .pn { position:absolute; bottom: 8px; right: 30px; font-family:'Caveat',cursive; font-size:17px; color:#777; }
+  .tape { position:absolute; top:-6px; right:60px; width:90px; height:24px; background: rgba(255,225,120,.55); transform: rotate(4deg); border-left:2px dotted rgba(0,0,0,.15); border-right:2px dotted rgba(0,0,0,.15);}
+  pre { margin:2px 0 0; font-family:'Patrick Hand',cursive; font-size:14px; line-height:18px; color:#2d2d2d; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#1a4cb0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+</svg>
+
+<!-- ======================= PAGE 1 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+  <div class="tape"></div>
+
+  <div class="title-wrap">
+    <h1>Production Engineering, Evals &amp; Security</h1>
+    <div class="sub">Module 4 · proving an agent that works in dev holds up under real production traffic</div>
+    <svg viewBox="0 0 560 10" style="height:10px"><g filter="url(#rough)"><path d="M4 5 Q60 1 120 5 T240 5 T360 4 T470 6 T556 3" fill="none" stroke="#2d2d2d" stroke-width="2" stroke-linecap="round"/></g></svg>
+  </div>
+  <p>Theme: <span class="hl">development hides the failures that production reveals.</span> Write a 1-page <b class="dk">design doc</b> BEFORE code: ① success criteria (eval) · ② failure handling · ③ cost/latency budget · ④ trust boundary.</p>
+
+  <h2>1 · Evals &amp; Calibrated Judges</h2>
+  <div class="row">
+    <div>
+      <p>An <b class="dk">eval</b> turns “done” from a feeling after 3 manual demos into a <span class="hl">tracked score on a holdout set</span>. Write the eval <i>before</i> implementation so you don't rationalize model output.</p>
+      <svg viewBox="0 0 565 78" style="margin-top:2px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 10 Q68 6 130 11 L131 48 Q68 52 5 47 Z"/>
+          <path d="M152 10 Q214 6 276 11 L277 48 Q214 52 151 47 Z"/>
+          <path d="M298 10 Q360 6 422 11 L423 48 Q360 52 297 47 Z"/>
+          <path d="M444 10 Q502 6 558 11 L559 48 Q502 52 443 47 Z" stroke="#2e8b3d"/>
+          <path d="M134 29 L148 29" marker-end="url(#ah)"/><path d="M280 29 L294 29" marker-end="url(#ah)"/><path d="M426 29 L440 29" marker-end="url(#ah)"/>
+        </g>
+        <g font-size="12.5" text-anchor="middle">
+          <text x="68" y="27" class="k">Dataset</text><text x="68" y="42" font-size="11">{input, expected}</text>
+          <text x="214" y="27" class="k">run_prompt()</text><text x="214" y="42" font-size="11">1 change at a time</text>
+          <text x="360" y="27" class="k">grade()</text><text x="360" y="42" font-size="11">match / code / judge</text>
+          <text x="501" y="27" class="k">Avg Score</text><text x="501" y="42" font-size="11">track on holdout</text>
+          <text x="282" y="70" class="r">coverage &gt; perfection: ship a small set covering happy + edge + adversarial cases</text>
+        </g>
+      </svg>
+    </div>
+    <div class="note">Change 1 thing at a time (prompt OR tool OR model) so you know what moved the score.</div>
+  </div>
+
+  <h3>Matching the Grader to the Output Shape</h3>
+  <div class="grid3">
+    <div class="box sm"><b class="dk">① Exact / String Match</b><br>1 correct form (label, ID, fixed value). ~0 cost, runs on every commit. Fails on any paraphrase.</div>
+    <div class="box sm"><b class="dk">② Code-Graded Check</b><br>Structural rule: <span class="code">json.loads</span>, <span class="code">ast.parse</span>, regex, range, required keys. Cheap &amp; deterministic.</div>
+    <div class="box sm"><b class="dk">③ LLM-as-Judge</b><br>Open-ended quality (faithful summary, tone, rationale). Costs 1 API call/case + noisy → schedule slower pass.</div>
+  </div>
+
+  <div class="row">
+    <div>
+      <h3>Building &amp; Calibrating an LLM-as-Judge</h3>
+      <ul>
+        <li>Judge prompt MUST require <span class="code">{"strengths", "weaknesses", "reasoning", "score"}</span> (<b class="dk">reasoning before score</b> improves reliability) + an <span class="hl">anchored score scale</span>: <b class="dk">1–3</b> misses required content · <b class="dk">4–7</b> partial · <b class="dk">8–10</b> complete &amp; faithful.</li>
+        <li><b class="dk">Calibrate before trusting:</b> human-score 20–50 cases across full range → run judge → compare agreement → refine rubric until aligned.</li>
+        <li><span class="hlp">expected_behavior must name the concrete output</span> (e.g., “lists all 3 action items + owners”), NEVER restate the input (“summarize transcript”).</li>
+      </ul>
+    </div>
+    <div class="note b">Unanchored rubric → judge drifts to a safe ~6 on everything!</div>
+  </div>
+
+  <div class="box red sm"><b class="dk">Postmortem – Passed every check, extracted wrong value:</b> Invoice extractor checked only valid JSON + 3 manual happy-path PDFs. Multi-page credit-memo PDF arrived → extracted credit total instead of invoice total. <span class="hl">Fix:</span> code check for structure + semantic accuracy check against labeled multi-page edge cases.</div>
+  <div class="pn">— 1 —</div>
+</section>
+
+<!-- ======================= PAGE 2 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">2 · Testing Pyramid &amp; Request Tracing</h2>
+  <p>Each test level catches a failure the others miss. <span class="hl">Most silent AI failures hide at the integration seam</span> where two passing components hand off.</p>
+
+  <svg viewBox="0 0 565 135" style="margin-top:3px">
+    <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 8 Q130 4 252 9 L253 34 Q130 38 7 33 Z"/>
+      <path d="M8 40 Q130 36 252 41 L253 66 Q130 70 7 65 Z"/>
+      <path d="M8 72 Q130 68 252 73 L253 98 Q130 102 7 97 Z" stroke="#c0392b"/>
+      <path d="M8 104 Q130 100 252 105 L253 130 Q130 134 7 129 Z"/>
+      <path d="M275 12 Q415 6 558 12 L559 128 Q415 134 274 127 Z" stroke="#2d2d2d" stroke-dasharray="5 3"/>
+    </g>
+    <g font-size="12.5">
+      <text x="16" y="25" class="k" font-weight="bold">Unit</text><text x="65" y="25">1 pure function in isolation (parser, validator)</text>
+      <text x="16" y="57" class="k" font-weight="bold">Functional</text><text x="85" y="57">1 component w/ mocked deps (prompt builder)</text>
+      <text x="16" y="89" class="r" font-weight="bold">Integration ★</text><text x="95" y="89">the SEAM between 2 components (retrieve → prompt)</text>
+      <text x="16" y="121" class="k" font-weight="bold">End-to-End</text><text x="88" y="121">full user request → final answer across live stack</text>
+
+      <text x="416" y="30" text-anchor="middle" class="k" font-weight="bold">Trace Excerpt (Seam Bug):</text>
+      <text x="286" y="50" font-size="11.5">step 1 retrieve() → [{'id':4,'content':'Refunds 14d'}] ✔</text>
+      <text x="286" y="68" font-size="11.5" class="r">step 2 build_prompt() → passed raw dict keys, NOT</text>
+      <text x="286" y="83" font-size="11.5" class="r">       chunk['content']! Prompt had "[{'id': 4}]" ✘</text>
+      <text x="286" y="101" font-size="11.5">step 3 model call → "I don't see a policy" (E2E fails)</text>
+      <text x="286" y="119" font-size="11.5" class="k">Fix: align handoff + add integration test on seam!</text>
+    </g>
+  </svg>
+
+  <div class="row">
+    <div>
+      <h3>Tracing &amp; Retrieval Routing (Fetch-Once vs Agentic Search)</h3>
+      <ul>
+        <li><b class="dk">Trace</b> = structured per-step record (<span class="code">request_id, step, input, output, tokens, latency_ms, status</span>) → localizes which step broke in seconds.</li>
+        <li><b class="dk">Fetch-once (RAG)</b>: 1 retrieval call → inject → 1 model call. Low cost/latency; best for single-fact lookups on stable corpora.</li>
+        <li><b class="dk">Agentic search</b>: model issues queries, reads results, refines across rounds. High token/latency cost; best for multi-step synthesis or fast-changing repos.</li>
+        <li><span class="hl">Route between them</span>: default to fetch-once; escalate to agentic search only when query signal requires multi-hop exploration.</li>
+      </ul>
+    </div>
+    <div class="note">Green unit + green functional + red E2E = broken integration seam!</div>
+  </div>
+
+  <h2>3 · Surviving Production Failures &amp; Model Selection</h2>
+  <div class="row">
+    <div>
+      <p>Every failure starts with one question: <span class="hl">will waiting and sending the exact same request again succeed?</span></p>
+      <div class="grid2" style="margin-top:4px">
+        <div class="box sm" style="border-color:#2e8b3d"><b class="dk">Retriable (Transient)</b><br><span class="code">429</span> Rate Limit · <span class="code">500</span> Internal · <span class="code">529</span> Overloaded · network timeout.<br>✔ Honor <span class="code">retry-after</span> header first, else <b class="dk">exponential backoff + jitter + cap + budget</b>.</div>
+        <div class="box sm" style="border-color:#c0392b"><b class="dk">Terminal (Permanent)</b><br><span class="code">400</span> Bad Request · <span class="code">401</span> Auth · <span class="code">403</span> Permission · <span class="code">404</span> Not Found.<br>✘ <b class="dk">Fail fast!</b> Retrying burns budget &amp; hides bug. Route to named fallback/log.</div>
+      </div>
+      <ul>
+        <li><b class="dk">Know what the SDK covers:</b> Anthropic SDK automatically retries transient <span class="code">429/5xx</span> a small fixed number of times. Don't wrap a naive <span class="code">time.sleep(0)</span> loop around it (multiplies retries &amp; deepens rate limit!).</li>
+        <li><b class="dk">Tool errors must come back explicitly:</b> return <span class="code">tool_result</span> with <span class="hl">is_error: True</span> + error text so Claude can recover. Never return <span class="code">""</span> or <span class="code">[]</span> (Claude mistakes empty error for “no results found” data!).</li>
+      </ul>
+    </div>
+    <div class="note b">time.sleep(0) on a 429 hammers the rate limit and takes the whole request down!</div>
+  </div>
+
+  <div class="box sm">
+    <b class="dk">Checkpoint 3 Retry Pattern:</b> catch <span class="code">RateLimitError</span> → use <span class="code">e.response.headers.get("retry-after")</span> or <span class="code">min(cap, 2**attempt) + random.uniform(0,1)</span>; catch <span class="code">APIStatusError</span> → if <span class="code">not is_retriable(e.status_code): raise</span>.
+  </div>
+  <div class="pn">— 2 —</div>
+</section>
+
+<!-- ======================= PAGE 3 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h3 style="margin-top:0">Model Selection &amp; Routing in Production</h3>
+  <div class="grid3">
+    <div class="box sm"><b class="dk">High-vol classification</b><br>Eval shows Haiku holds bar → pick <span class="hlg">Haiku</span> (constraint = <b>cost-at-volume</b>).</div>
+    <div class="box sm"><b class="dk">Hard dependent refactor</b><br>Sonnet misses bar on hard steps → pick <span class="hlp">Opus</span> (constraint = <b>quality on hard reasoning</b>).</div>
+    <div class="box sm"><b class="dk">Mixed traffic</b><br>Mostly simple lookups + few complex syntheses → <span class="hl">Route</span>: Sonnet/Haiku default + Opus override.</div>
+  </div>
+
+  <h2>4 · Cost, Latency &amp; Multi-Agent Orchestration</h2>
+  <div class="row">
+    <div>
+      <p>You can't budget what you don't measure: log <span class="code">input_tokens, output_tokens, cache_read, latency_ms, status</span> per call. <span class="hl">Reliability has a floor</span> (defined by your eval) — only optimize cost above that floor.</p>
+      <div class="grid2" style="margin-top:4px">
+        <div class="box sm"><b class="dk">5 Budget Levers</b><br>① Model tier · ② Prompt/context trim · ③ Fewer tool rounds · ④ Stream (perceived latency) vs Batch · ⑤ Prompt caching.</div>
+        <div class="box sm"><b class="dk">Prompt Caching + Batches API</b><br>Cache stable prefix (<span class="code">tools → system → messages</span>) for up to ~90% read discount; <b class="dk">Message Batches API</b> = async up to 24h for <span class="hlg">~50% cost cut</span> (stack both!).</div>
+      </div>
+    </div>
+    <div class="note">Streaming improves perceived speed (TTFT), NOT total token cost!</div>
+  </div>
+
+  <h3>Orchestrator-Worker Fan-Out = ~15× Token Multiplier</h3>
+  <svg viewBox="0 0 565 104" style="margin-top:2px">
+    <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 32 Q65 28 122 33 L123 72 Q65 76 7 71 Z" stroke="#2d2d2d"/>
+      <path d="M185 6 Q250 3 315 7 L316 32 Q250 35 184 31 Z"/>
+      <path d="M185 39 Q250 36 315 40 L316 65 Q250 68 184 64 Z"/>
+      <path d="M185 72 Q250 69 315 73 L316 98 Q250 101 184 97 Z"/>
+      <path d="M126 45 L180 20" marker-end="url(#ah)"/><path d="M126 52 L180 52" marker-end="url(#ah)"/><path d="M126 59 L180 84" marker-end="url(#ah)"/>
+      <path d="M320 20 L372 45" marker-end="url(#ah)"/><path d="M320 52 L372 52" marker-end="url(#ah)"/><path d="M320 84 L372 59" marker-end="url(#ah)"/>
+      <path d="M376 22 Q465 18 556 23 L557 82 Q465 86 375 81 Z" stroke="#c0392b"/>
+    </g>
+    <g font-size="12.5" text-anchor="middle">
+      <text x="65" y="50" class="k" font-weight="bold">Orchestrator</text><text x="65" y="64" font-size="11">plans &amp; spawns</text>
+      <text x="250" y="23">Worker 1 (own ctx)</text>
+      <text x="250" y="56">Worker 2 (own ctx)</text>
+      <text x="250" y="89">Worker 3 (own ctx)</text>
+      <text x="466" y="42" class="r">~15× token cost vs single chat!</text>
+      <text x="466" y="58" font-size="11.5">✔ Use ONLY when task splits into</text>
+      <text x="466" y="72" font-size="11.5" class="k">independent parallel research parts</text>
+    </g>
+  </svg>
+  <div class="box dash sm"><b class="dk">Checkpoint 4 Match:</b> ① Single-fact lookup → <b class="dk">C</b> (fetch-once + smallest model) · ② Broad research splitting into independent parts → <b class="dk">A</b> (orchestrator-worker parallel fan-out) · ③ User-facing instant reply → <b class="dk">D</b> (streaming) · ④ Cost-sensitive non-urgent job → <b class="dk">B</b> (Batches API + prompt caching).</div>
+
+  <h2>5 · Security, Guardrails &amp; Regulated Reviews</h2>
+  <div class="row">
+    <div>
+      <ul>
+        <li><b class="dk">Prompt Injection vs Jailbreak:</b> Jailbreak = <i>user</i> tries to bypass safety policy. <span class="hl">Prompt Injection</span> = <i>untrusted external content</i> (web page, ticket, repo file, tool output) carries hidden instructions aimed at the agent. <b class="dk">Same defense shape!</b></li>
+        <li>Model reads the whole context as <b class="dk">one stream of tokens</b> — no built-in wall between trusted instructions and untrusted data. Trusting your own employees doesn't stop indirect injection!</li>
+        <li><b class="dk">Defense-in-depth layers:</b>
+          <br>① <b class="dk">Treat untrusted input as data</b> (delimit/wrap, strip instructions).
+          <br>② <b class="dk">Least-privilege identity &amp; scoped secrets</b> (<span class="code">os.environ["API_KEY"]</span>, never inline in config; explicit filesystem <span class="code">deny_paths: ["/etc", "/secrets", "~/.aws"]</span>).
+          <br>③ <b class="dk">Hook-based guardrail (<span class="code">PreToolUse</span>)</b>: runs <i>before</i> <span class="code">write_file</span> / shell executes; blocks any path outside <span class="code">/workspace/output</span> (<span class="hl">enforcement, not convention!</span>).
+          <br>④ <b class="dk">Audit log + OS sandboxing</b>: log every privileged action (<span class="code">log_audit(action, path, result)</span>) + container/OS sandbox as residual control.</li>
+      </ul>
+    </div>
+    <div class="note b">Fetched page had hidden HTML comment: wrote to /workspace/config/settings.json! Block with PreToolUse hook.</div>
+  </div>
+  <div class="pn">— 3 —</div>
+</section>
+
+<!-- ======================= PAGE 4 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">6 · Cumulative Production-Hardening Task</h2>
+  <p>Real production failures stack across layers. Diagnose the 3 planted defects and assemble the hardened version:</p>
+
+  <div class="grid2" style="margin-top:6px">
+    <div class="box red">
+      <b class="dk">✘ Broken Prototype (As Shipped)</b>
+<pre>def answer(question, page_url):
+    page = fetch(page_url) # untrusted!
+    notes = read_file("/workspace/input/notes")
+    # Defect 3: untrusted destination path!
+    write_file(page.suggested_path,
+               summarize(page))
+    resp = None
+    for i in range(5):
+        try:
+            resp = client.messages.create(...)
+            break
+        except Exception:
+            # Defect 2: instant retry on ALL errs!
+            time.sleep(0)
+    # Defect 1: 0 eval / holdout set!
+    return resp.content[0].text</pre>
+    </div>
+    <div class="box" style="border-color:#2e8b3d">
+      <b class="dk">✔ Production-Hardened Version</b>
+<pre>def answer(question, page_url):
+    page = fetch(page_url) # still untrusted
+    notes = read_file("/workspace/input/notes")
+    # Fix 3: fixed path + PreToolUse hook + audit
+    write_file("/workspace/output/summary.txt",
+               summarize(page))
+    # Fix 2: backoff, retry-after, fail fast 4xx
+    resp = call_with_retry(
+        lambda: client.messages.create(
+            model=MODEL, max_tokens=MAX_TOKENS,
+            messages=msg(question)))
+    # Fix 1: graded holdout eval run on every change
+    return resp.content[0].text</pre>
+    </div>
+  </div>
+
+  <div class="grid3" style="margin-top:6px">
+    <div class="box sm"><b class="dk">Layer 1 · Eval / Test</b><br>No graded holdout set existed (only 3 manual demo runs) → add dataset + calibrated rubric run on every change.</div>
+    <div class="box sm"><b class="dk">Layer 2 · Error / Cost</b><br><span class="code">time.sleep(0)</span> + catching <span class="code">Exception</span> retries terminal 400s &amp; deepens 429s → use <span class="code">call_with_retry()</span>.</div>
+    <div class="box sm"><b class="dk">Layer 3 · Security</b><br><span class="code">page.suggested_path</span> lets fetched content pick write path → hardcode <span class="code">/workspace/output/…</span> + <span class="code">PreToolUse</span> hook.</div>
+  </div>
+
+  <h2>7 · Reference Tables &amp; Glossary Quick-Look</h2>
+  <div class="grid2">
+    <div class="box sm">
+      <b class="dk">Error-Handling Decision Table</b>
+      <ul>
+        <li><span class="code">429 RateLimitError</span> → Retriable; honor <span class="code">retry-after</span>, else exp backoff + jitter.</li>
+        <li><span class="code">500 / 529 Overloaded</span> → Retriable; exp backoff up to cap + retry budget.</li>
+        <li><span class="code">400 / 401 / 403 / 404</span> → Terminal; raise immediately, log &amp; alert.</li>
+        <li>Tool exception → Return <span class="code">tool_result(is_error=True)</span> to model.</li>
+      </ul>
+    </div>
+    <div class="box sm">
+      <b class="dk">Regulated Review Defense Checklist</b>
+      <ul>
+        <li><b class="dk">Input boundary:</b> wrap untrusted data; separate from system instructions.</li>
+        <li><b class="dk">Identity &amp; secrets:</b> least privilege IAM; secrets in env/vault, never git.</li>
+        <li><b class="dk">Action enforcement:</b> <span class="code">PreToolUse</span> hook blocks out-of-scope writes before execution.</li>
+        <li><b class="dk">Evidence trail:</b> deterministic audit log + OS/container sandbox.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Cheat-sheet: 5 Module Takeaways</h3>
+  <div class="box dash" style="line-height:20px;font-size:14.5px;padding:6px 12px">
+    ① <b class="dk">Set the standard before you build:</b> write the design doc &amp; eval first; match grader to output shape (match / code / calibrated judge) · ② <b class="dk">Test the seam &amp; trace every step:</b> unit + functional pass while integration handoff breaks; trace logs pinpoint the step · ③ <b class="dk">Sort retriable vs terminal:</b> backoff + <span class="code">retry-after</span> on 429/5xx, fail fast on 4xx, pass tool failures via <span class="code">is_error=True</span> · ④ <b class="dk">Instrument per-call budget:</b> cache stable prefixes, batch offline jobs (~50% off), fan out subagents (~15× tokens) ONLY when work truly parallelizes · ⑤ <b class="dk">Enforce boundaries with hooks:</b> treat fetched content as data, scope credentials, and gate writes with <span class="code">PreToolUse</span> hooks + audit logs.
+  </div>
+  <div class="pn">— 4 —</div>
+</section>
+
+</body>
+</html>

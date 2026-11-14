@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Module 1 – MSO Foundations (Study Notes)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #d9d7d2;
+    font-family: 'Patrick Hand', 'Caveat', cursive;
+    color: #1a4cb0;
+    font-size: 15.5px;
+    line-height: 22px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    margin: 12px auto;
+    padding: 30px 24px 24px 70px;
+    overflow: hidden;
+    background-color: #fbfaf7;
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 21px, rgba(70,130,215,.30) 21px, rgba(70,130,215,.30) 22px);
+    background-position: 0 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    page-break-after: always;
+    break-after: page;
+  }
+  .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: 56px; width: 2px; background: rgba(232,105,135,.75); }
+  .page::after { content: ""; position: absolute; top: 0; bottom: 0; left: 60px; width: 1px; background: rgba(232,105,135,.35); }
+  .holes { position:absolute; left:14px; top:0; bottom:0; width:20px; }
+  .holes i { position:absolute; left:0; width:18px; height:18px; border-radius:50%; background:#d9d7d2; box-shadow: inset 1px 2px 3px rgba(0,0,0,.35); }
+  @media print { body { background: none; } .page { margin: 0; box-shadow: none; } }
+  h1, h2, h3 { font-family: 'Caveat', cursive; color: #2d2d2d; margin: 0; font-weight: 700; line-height: 1; }
+  h1 { font-size: 38px; transform: rotate(-.6deg); }
+  h2 { font-size: 29px; margin-top: 10px; transform: rotate(-.4deg); }
+  h3 { font-size: 21px; margin-top: 4px; }
+  p { margin: 0; }
+  ul { margin: 0; padding-left: 20px; list-style: none; }
+  li { position: relative; margin: 0; }
+  li::before { content: "✦"; position: absolute; left: -16px; font-size: 11px; color: #1a4cb0; top: 1px; }
+  .hl { background: linear-gradient(transparent 12%, rgba(255,226,40,.6) 12%, rgba(255,226,40,.6) 92%, transparent 92%); padding: 0 2px; border-radius: 3px; }
+  .hlg { background: linear-gradient(transparent 12%, rgba(120,220,120,.45) 12%, rgba(120,220,120,.45) 92%, transparent 92%); padding: 0 2px; }
+  .hlp { background: linear-gradient(transparent 12%, rgba(255,150,190,.45) 12%, rgba(255,150,190,.45) 92%, transparent 92%); padding: 0 2px; }
+  .dk { color: #2d2d2d; }
+  .row { display: grid; grid-template-columns: 1fr 126px; gap: 12px; margin-top: 4px; }
+  .note { font-family: 'Caveat', cursive; font-size: 17px; line-height: 17px; color: #c0392b; transform: rotate(-2deg); padding: 3px 2px 3px 8px; border-left: 2px dashed #c0392b; align-self: start; margin-top: 4px; }
+  .note.b { transform: rotate(1.8deg); color: #7a3fb0; border-color:#7a3fb0; }
+  .box { border: 2px solid #2d2d2d; padding: 4px 10px; margin: 6px 0; border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px; background: rgba(255,255,255,.25); }
+  .box.dash { border-style: dashed; }
+  .box.red { border-color: #c0392b; }
+  .code { font-family: 'Patrick Hand', cursive; color: #2d2d2d; background: rgba(0,0,0,.04); padding: 0 4px; border-radius: 3px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+  .box.sm { padding: 2px 8px; margin: 3px 0; line-height: 20px; }
+  .title-wrap { margin-bottom: 2px; }
+  .sub { font-family:'Caveat',cursive; font-size: 19px; color:#c0392b; line-height: 22px; }
+  svg { display:block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: 'Patrick Hand', cursive; fill: #1a4cb0; }
+  svg text.k { fill:#2d2d2d; }
+  svg text.r { fill:#c0392b; font-family:'Caveat',cursive; font-size:16px; }
+  .pn { position:absolute; bottom: 8px; right: 30px; font-family:'Caveat',cursive; font-size:17px; color:#777; }
+  .tape { position:absolute; top:-6px; right:60px; width:90px; height:24px; background: rgba(255,225,120,.55); transform: rotate(4deg); border-left:2px dotted rgba(0,0,0,.15); border-right:2px dotted rgba(0,0,0,.15);}
+  pre { margin:2px 0 0; font-family:'Patrick Hand',cursive; font-size:14.5px; line-height:19px; color:#2d2d2d; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#1a4cb0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+</svg>
+
+<!-- ======================= PAGE 1 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+  <div class="tape"></div>
+
+  <div class="title-wrap">
+    <h1>MSO Foundations — How LLMs Behave &amp; Reach Us</h1>
+    <div class="sub">Module 1 · tokens, context budget, sampling, model tiers &amp; API transport mechanics</div>
+    <svg viewBox="0 0 560 10" style="height:10px"><g filter="url(#rough)"><path d="M4 5 Q60 1 120 5 T240 5 T360 4 T470 6 T556 3" fill="none" stroke="#2d2d2d" stroke-width="2" stroke-linecap="round"/></g></svg>
+  </div>
+  <p>Before writing code against Claude, get the mental model right: <span class="hl">what the API meters</span>, why outputs vary, how model tiers &amp; reasoning compose, and which transport pattern fits your workload.</p>
+
+  <h2>1 · Tokens &amp; the Context Window Budget</h2>
+  <div class="row">
+    <div>
+      <ul>
+        <li><b class="dk">Tokens</b> = unit of input, output &amp; cost (not words/chars). Chars-per-token varies by model tokenizer.</li>
+        <li>Everything counts: <span class="code">system prompt + history + injected docs + tool defs + tool results + model output</span>.</li>
+        <li><b class="dk">Context window</b> = fixed token budget holding the entire request + response at once.</li>
+      </ul>
+      <svg viewBox="0 0 565 106" style="margin-top:4px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 12 Q280 6 556 12 L557 52 Q280 56 5 51 Z" stroke="#2d2d2d"/>
+          <path d="M98 12 L97 52 M215 11 L216 52 M335 12 L334 52 M445 11 L446 52"/>
+          <path d="M10 66 Q135 62 265 67 L266 98 Q135 102 9 97 Z" stroke="#c0392b"/>
+          <path d="M295 66 Q425 62 555 67 L556 98 Q425 102 294 97 Z" stroke="#7a3fb0"/>
+        </g>
+        <g font-size="12.5" text-anchor="middle">
+          <text x="52" y="36" class="k">System</text>
+          <text x="156" y="36" class="k">History / Docs</text>
+          <text x="275" y="36" class="k">Tool Defs</text>
+          <text x="390" y="36" class="k">Tool Results</text>
+          <text x="500" y="36" class="r">Model Output</text>
+          <text x="137" y="81" class="r">① Input &gt; Window Ceiling</text>
+          <text x="137" y="94" font-size="11.5">Rejected w/ validation error BEFORE gen</text>
+          <text x="425" y="81" class="k">② Hits Ceiling MID-generation</text>
+          <text x="425" y="94" font-size="11.5">Stops &amp; returns partial + model_context_window_exceeded</text>
+        </g>
+      </svg>
+    </div>
+    <div class="note">Window never auto-expands or silently drops turns! App must trim / summarise history.</div>
+  </div>
+
+  <h2>2 · Sampling &amp; Non-Determinism</h2>
+  <div class="row">
+    <div>
+      <p>At each step Claude produces a <b class="dk">probability distribution</b> over next tokens and <i>samples</i> from it → identical prompts can return different wording even when both answers are right.</p>
+      <ul>
+        <li><b class="dk">Low temp (→ 0)</b>: concentrates probability on top tokens → more repeatable (needed for classifiers), <span class="hlp">still NOT guaranteed deterministic</span>.</li>
+        <li><b class="dk">High temp</b>: flattens distribution → more varied wording/labels.</li>
+        <li><span class="hl">Newest Claude models reject non-default sampling params</span> (<span class="code">temperature</span>, <span class="code">top_p</span>, <span class="code">top_k</span> → <b class="dk">400 error</b>); steer via prompting instead.</li>
+      </ul>
+    </div>
+    <div class="note b">Never assert exact string equality on open text! Assert properties/schema or run an eval judge.</div>
+  </div>
+
+  <h2>3 · Model Family Tiers vs Reasoning Modes</h2>
+  <p>Two <span class="hl">independent, composable levers</span>: <b>which model</b> runs (capability tier) ⟂ <b>whether it thinks</b> per request.</p>
+  <svg viewBox="0 0 565 112" style="margin-top:3px">
+    <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 10 Q72 6 135 11 L136 74 Q72 78 7 73 Z" stroke="#2e8b3d"/>
+      <path d="M148 10 Q212 6 275 11 L276 74 Q212 78 147 73 Z" stroke="#1a4cb0"/>
+      <path d="M288 10 Q352 6 415 11 L416 74 Q352 78 287 73 Z" stroke="#7a3fb0"/>
+      <path d="M428 10 Q492 6 556 11 L557 74 Q492 78 427 73 Z" stroke="#c0392b"/>
+      <path d="M15 94 Q282 88 550 94" marker-end="url(#ah)"/>
+    </g>
+    <g font-size="12.5" text-anchor="middle">
+      <text x="72" y="28" class="k" font-weight="bold">Haiku</text>
+      <text x="72" y="45" font-size="11.5">speed &amp; cost-at-vol</text><text x="72" y="62" font-size="11">step down if eval holds</text>
+      <text x="212" y="28" class="k" font-weight="bold">Sonnet ★</text>
+      <text x="212" y="45" font-size="11.5">balanced prod default</text><text x="212" y="62" font-size="11">start here first</text>
+      <text x="352" y="28" class="k" font-weight="bold">Opus</text>
+      <text x="352" y="45" font-size="11.5">hard reasoning / code</text><text x="352" y="62" font-size="11">step up when eval fails</text>
+      <text x="492" y="28" class="r" font-weight="bold">Fable</text>
+      <text x="492" y="45" font-size="11.5">max intelligence tier</text><text x="492" y="62" font-size="11">most demanding agentic</text>
+      <text x="282" y="108" class="r">higher capability &amp; cost  ───►   (always gate tier moves with an eval!)</text>
+    </g>
+  </svg>
+  <div class="box sm">
+    <b class="dk">Adaptive thinking</b> (per-call): model decides when/how much to think; tune depth with <span class="hl">effort</span> (old <span class="code">budget_tokens</span> is deprecated → <b class="dk">400 error</b> on newest models). Thinking content is omitted by default (request summarized display if needed). Earns cost on multi-step logic; wasted on lookups/classifiers.
+  </div>
+  <div class="pn">— 1 —</div>
+</section>
+
+<!-- ======================= PAGE 2 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">4 · Prompting Modes: Zero-Shot, One-Shot, Multi-Shot</h2>
+  <div class="row">
+    <div>
+      <p>How many worked <span class="code">input → output</span> examples sit inside the prompt (examples are <b class="dk">not training data</b>; they show exact shape in context).</p>
+      <div class="grid3" style="margin-top:4px">
+        <div class="box sm"><b class="dk">Zero-shot</b><br>Instruction only, 0 examples. Cheapest; use when task is simple &amp; shape is obvious.</div>
+        <div class="box sm"><b class="dk">One-shot</b><br>1 input/output pair. Anchors basic formatting quickly.</div>
+        <div class="box sm"><b class="dk">Multi-shot (few-shot)</b><br>2–3+ pairs. Fixes invented structure, casing, or tricky edge cases faster than more prose.</div>
+      </div>
+      <ul>
+        <li><b class="dk">Cost/Quality trade-off:</b> every example adds input tokens on <i>every call</i> &amp; eats context window.</li>
+        <li><b class="dk">Interacts with model tier:</b> a few examples often let a <span class="hlg">smaller, cheaper model (Haiku/Sonnet)</span> match a structure that otherwise needed a larger model zero-shot.</li>
+      </ul>
+    </div>
+    <div class="note">Zero-shot works? Adding 3 examples just burns tokens for ~0 gain!</div>
+  </div>
+
+  <h2>5 · Reaching Claude: SDK vs REST &amp; Request Shapes</h2>
+  <div class="row">
+    <div>
+      <p><b class="dk">Raw REST</b> (HTTP endpoint + API key + JSON body) vs <b class="dk">Official SDK</b> (Python / TS thin wrapper over the exact same REST API — handles auth, request building, <span class="hl">default retries</span>, parsing).</p>
+      <svg viewBox="0 0 565 148" style="margin-top:4px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 8 Q135 4 268 9 L269 66 Q135 70 5 65 Z"/>
+          <path d="M294 8 Q425 4 558 9 L559 66 Q425 70 293 65 Z"/>
+          <path d="M6 80 Q135 76 268 81 L269 138 Q135 142 5 137 Z"/>
+          <path d="M294 80 Q425 76 558 81 L559 138 Q425 142 293 137 Z" stroke="#2e8b3d"/>
+        </g>
+        <g font-size="12.5" text-anchor="middle">
+          <text x="137" y="25" class="k" font-weight="bold">① Synchronous</text>
+          <text x="137" y="42">send → wait → full response at once</text>
+          <text x="137" y="57" font-size="11.5">short replies, simple backend steps</text>
+
+          <text x="426" y="25" class="k" font-weight="bold">② Streaming (SSE)</text>
+          <text x="426" y="42">tokens arrive live as generated</text>
+          <text x="426" y="57" font-size="11.5">user watching UI / long outputs</text>
+
+          <text x="137" y="97" class="k" font-weight="bold">③ Async / Non-blocking</text>
+          <text x="137" y="114">Python AsyncAnthropic / TS Promise await</text>
+          <text x="137" y="129" font-size="11.5">real-time concurrency without blocking thread</text>
+
+          <text x="426" y="97" class="k" font-weight="bold">④ Message Batches API</text>
+          <text x="426" y="114">submit bulk → poll job ID (up to 24h)</text>
+          <text x="426" y="129" class="r">~50% lower token cost · offline / evals / 50k docs</text>
+        </g>
+      </svg>
+    </div>
+    <div class="note b">TS SDK standard client is already Promise-based (no separate Async class).</div>
+  </div>
+
+  <h2>6 · Exam Scenarios &amp; Quiz Playbook</h2>
+  <div class="grid2">
+    <div class="box sm"><b class="dk">Q: Identical prompts = identical text?</b><br>✘ No — model samples next token from probability distribution; wording varies even when both are right.</div>
+    <div class="box sm"><b class="dk">Q: Model choice vs reasoning mode?</b><br>✔ Separate levers: model picks family tier; extended/adaptive thinking is a per-call setting.</div>
+    <div class="box sm"><b class="dk">Scenario: Classifier temp 0 vs high temp</b><br>Temp 0 concentrates probability (repeatable label, still not 100% deterministic). High temp spreads distribution (labels drift).</div>
+    <div class="box sm"><b class="dk">Scenario: Wrong output structure in zero-shot</b><br>Switch to <span class="hl">multi-shot</span> (2–3 input/output pairs) to show exact structure; add fewest examples that pass eval.</div>
+    <div class="box sm"><b class="dk">Scenario: 50,000 docs overnight, no user waiting</b><br>Use <span class="hlg">Message Batches API + polling</span> (lower cost, avoids sync rate-limit walls; streaming buys nothing).</div>
+    <div class="box sm"><b class="dk">Scenario: Long multi-turn agent failing in prod</b><br>Context window fixed budget fills up → input error or <span class="code">model_context_window_exceeded</span> truncation. Trim/summarise!</div>
+  </div>
+
+  <h3>Cheat-sheet: 5 Core Takeaways</h3>
+  <div class="box dash" style="line-height:20px;font-size:14.5px;padding:4px 12px">
+    ① <b class="dk">Budget in tokens</b>, not words — prompt, history, tools, and output all share the meter · ② <b class="dk">Context window is fixed</b> — oversized input fails upfront; hitting ceiling mid-gen returns <span class="code">model_context_window_exceeded</span> · ③ <b class="dk">Sampling = non-deterministic</b> — test structure/properties &amp; grade quality with evals, never exact string match on prose · ④ <b class="dk">Model tier ⟂ thinking ⟂ few-shot</b> — start w/ Sonnet + simplest prompt, prove changes on an eval · ⑤ <b class="dk">Match transport to listener</b> — Stream for humans, Async for concurrency, Batch for offline bulk.
+  </div>
+  <div class="pn">— 2 —</div>
+</section>
+
+</body>
+</html>

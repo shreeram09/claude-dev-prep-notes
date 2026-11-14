@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Module 5 – Accelerators & IP Contribution (Study Notes)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #d9d7d2;
+    font-family: 'Patrick Hand', 'Caveat', cursive;
+    color: #1a4cb0;
+    font-size: 15.5px;
+    line-height: 22px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    margin: 12px auto;
+    padding: 30px 24px 24px 70px;
+    overflow: hidden;
+    background-color: #fbfaf7;
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 21px, rgba(70,130,215,.30) 21px, rgba(70,130,215,.30) 22px);
+    background-position: 0 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    page-break-after: always;
+    break-after: page;
+  }
+  .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: 56px; width: 2px; background: rgba(232,105,135,.75); }
+  .page::after { content: ""; position: absolute; top: 0; bottom: 0; left: 60px; width: 1px; background: rgba(232,105,135,.35); }
+  .holes { position:absolute; left:14px; top:0; bottom:0; width:20px; }
+  .holes i { position:absolute; left:0; width:18px; height:18px; border-radius:50%; background:#d9d7d2; box-shadow: inset 1px 2px 3px rgba(0,0,0,.35); }
+  @media print { body { background: none; } .page { margin: 0; box-shadow: none; } }
+  h1, h2, h3 { font-family: 'Caveat', cursive; color: #2d2d2d; margin: 0; font-weight: 700; line-height: 1; }
+  h1 { font-size: 38px; transform: rotate(-.6deg); }
+  h2 { font-size: 29px; margin-top: 10px; transform: rotate(-.4deg); }
+  h3 { font-size: 21px; margin-top: 4px; }
+  p { margin: 0; }
+  ul { margin: 0; padding-left: 20px; list-style: none; }
+  li { position: relative; margin: 0; }
+  li::before { content: "✦"; position: absolute; left: -16px; font-size: 11px; color: #1a4cb0; top: 1px; }
+  .hl { background: linear-gradient(transparent 12%, rgba(255,226,40,.6) 12%, rgba(255,226,40,.6) 92%, transparent 92%); padding: 0 2px; border-radius: 3px; }
+  .hlg { background: linear-gradient(transparent 12%, rgba(120,220,120,.45) 12%, rgba(120,220,120,.45) 92%, transparent 92%); padding: 0 2px; }
+  .hlp { background: linear-gradient(transparent 12%, rgba(255,150,190,.45) 12%, rgba(255,150,190,.45) 92%, transparent 92%); padding: 0 2px; }
+  .dk { color: #2d2d2d; }
+  .row { display: grid; grid-template-columns: 1fr 126px; gap: 12px; margin-top: 4px; }
+  .note { font-family: 'Caveat', cursive; font-size: 17px; line-height: 17px; color: #c0392b; transform: rotate(-2deg); padding: 3px 2px 3px 8px; border-left: 2px dashed #c0392b; align-self: start; margin-top: 4px; }
+  .note.b { transform: rotate(1.8deg); color: #7a3fb0; border-color:#7a3fb0; }
+  .box { border: 2px solid #2d2d2d; padding: 4px 10px; margin: 6px 0; border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px; background: rgba(255,255,255,.25); }
+  .box.dash { border-style: dashed; }
+  .box.red { border-color: #c0392b; }
+  .code { font-family: 'Patrick Hand', cursive; color: #2d2d2d; background: rgba(0,0,0,.04); padding: 0 4px; border-radius: 3px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+  .box.sm { padding: 2px 8px; margin: 3px 0; line-height: 20px; }
+  .title-wrap { margin-bottom: 2px; }
+  .sub { font-family:'Caveat',cursive; font-size: 19px; color:#c0392b; line-height: 22px; }
+  svg { display:block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: 'Patrick Hand', cursive; fill: #1a4cb0; }
+  svg text.k { fill:#2d2d2d; }
+  svg text.r { fill:#c0392b; font-family:'Caveat',cursive; font-size:16px; }
+  .pn { position:absolute; bottom: 8px; right: 30px; font-family:'Caveat',cursive; font-size:17px; color:#777; }
+  .tape { position:absolute; top:-6px; right:60px; width:90px; height:24px; background: rgba(255,225,120,.55); transform: rotate(4deg); border-left:2px dotted rgba(0,0,0,.15); border-right:2px dotted rgba(0,0,0,.15);}
+  pre { margin:2px 0 0; font-family:'Patrick Hand',cursive; font-size:14px; line-height:18px; color:#2d2d2d; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#1a4cb0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+</svg>
+
+<!-- ======================= PAGE 1 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+  <div class="tape"></div>
+
+  <div class="title-wrap">
+    <h1>Accelerators &amp; IP Contribution</h1>
+    <div class="sub">Module 5 · where code starts working is where reusable, deployable, auditable work begins</div>
+    <svg viewBox="0 0 560 10" style="height:10px"><g filter="url(#rough)"><path d="M4 5 Q60 1 120 5 T240 5 T360 4 T470 6 T556 3" fill="none" stroke="#2d2d2d" stroke-width="2" stroke-linecap="round"/></g></svg>
+  </div>
+  <p>Throughline: <span class="hl">a build that works is not yet a build that survives reuse, review, or deployment.</span> Package while fresh, verify for maintainers, pin versions, defend platform residency, and guard every seam.</p>
+
+  <h2>1 · Packaging a Working Build for Reuse (Accelerators)</h2>
+  <div class="row">
+    <div>
+      <p>An <b class="dk">accelerator</b> separates engagement-specific values from the reusable core and exposes them as <span class="hl">documented parameters with defaults</span> — next team configures instead of editing the loop.</p>
+      <div class="grid3" style="margin-top:4px">
+        <div class="box sm"><b class="dk">① Agent Template</b><br>System prompt + tool schemas + loop. Parameterize domain values (paths, prompts, scopes, thresholds).</div>
+        <div class="box sm"><b class="dk">② MCP Server Pkg</b><br>Exposes tools + documented inputs. Installing team sets <b class="dk">scope</b> &amp; credential refs without code edits.</div>
+        <div class="box sm"><b class="dk">③ Portable Eval Suite</b><br>Dataset + rubric shipped together. Proves asset works in new context &amp; <span class="hlg">gates model promotion</span>.</div>
+      </div>
+      <ul>
+        <li><b class="dk">Document assumptions:</b> environment prereqs, expected inputs, handled failure modes, and the bundled eval baseline.</li>
+        <li><b class="dk">Bundle the audit log:</b> record data touched, identity acted under, and actions taken so regulated reviews pass.</li>
+      </ul>
+    </div>
+    <div class="note">Loose scripts look reusable, but bury customer paths across files!</div>
+  </div>
+  <div class="box red sm"><b class="dk">Checkpoint 1 Fix:</b> <span class="code">repo_path="/home/acme-corp/services/checkout"</span> hardcoded inside <span class="code">build_review_agent()</span> → move to parameter <span class="hl">def build_review_agent(repo_path):</span> so the next engagement sets it without editing code.</div>
+
+  <h2>2 · Contributing Back to Shared Infrastructure</h2>
+  <div class="row">
+    <div>
+      <p>A maintainer accepts what they can <span class="hl">verify without reconstructing context</span>. Match the asset to the right channel AND clear all 5 readiness checks:</p>
+      <svg viewBox="0 0 565 98" style="margin-top:2px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 8 Q92 4 178 9 L179 62 Q92 66 5 61 Z"/>
+          <path d="M196 8 Q282 4 368 9 L369 62 Q282 66 195 61 Z" stroke="#2e8b3d"/>
+          <path d="M386 8 Q472 4 558 9 L559 62 Q472 66 385 61 Z" stroke="#7a3fb0"/>
+        </g>
+        <g font-size="12" text-anchor="middle">
+          <text x="92" y="25" class="k" font-weight="bold">Case A: Focused Tool</text>
+          <text x="92" y="41">→ Tool's OWN repo</text>
+          <text x="92" y="55" class="r">Needs: unit test proving behavior</text>
+
+          <text x="282" y="25" class="k" font-weight="bold">Case B: Full Customer App</text>
+          <text x="282" y="41">→ Anthropic Cookbook</text>
+          <text x="282" y="55" class="r">Needs: strip UI/deploy to 1 pattern</text>
+
+          <text x="472" y="25" class="k" font-weight="bold">Case C: 1-Line Engagement Fix</text>
+          <text x="472" y="41">→ Cookbook example's repo</text>
+          <text x="472" y="55" class="r">Needs: IP/licensing rights check first!</text>
+
+          <text x="282" y="86" class="k" font-size="13">5 Readiness Gates: ① Focused code · ② Runnable example · ③ Test · ④ Env assumptions · ⑤ Licensing/IP rights cleared</text>
+        </g>
+      </svg>
+    </div>
+    <div class="note b">Engagement code without a rights check can be merged then forcibly reverted!</div>
+  </div>
+  <div class="pn">— 1 —</div>
+</section>
+
+<!-- ======================= PAGE 2 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">3 · Requirements &amp; Systems Lifecycle</h2>
+  <div class="row">
+    <div>
+      <p>Translate vague business goals (“fast, accurate EU call summarizer”) into <span class="hl">checkable requirements</span> before picking an architecture:</p>
+      <div class="grid2" style="margin-top:4px">
+        <div class="box sm"><b class="dk">Functional Requirement</b><br>What the system <i>does</i> (checkable behavior/process).<br>✔ “Agent produces a summary that a <b>human approves before it is stored</b>.”</div>
+        <div class="box sm"><b class="dk">Infrastructure Requirement</b><br>Where/how it <i>runs</i> (residency, cloud boundary).<br>✔ “<b>Transcript data is processed in the EU</b>.”<br>(✘ “Fast and accurate” = uncheckable wish!)</div>
+      </div>
+    </div>
+    <div class="note">Prompt templates = design choice, not an infra requirement.</div>
+  </div>
+
+  <h3>5-Phase Systems Lifecycle (Checkpoint 4 Mapping)</h3>
+  <svg viewBox="0 0 565 102" style="margin-top:2px">
+    <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 10 Q54 6 104 11 L105 68 Q54 72 3 67 Z"/>
+      <path d="M118 10 Q168 6 218 11 L219 68 Q168 72 117 67 Z"/>
+      <path d="M232 10 Q282 6 332 11 L333 68 Q282 72 231 67 Z"/>
+      <path d="M346 10 Q396 6 446 11 L447 68 Q396 72 345 67 Z" stroke="#c0392b"/>
+      <path d="M460 10 Q510 6 560 11 L561 68 Q510 72 459 67 Z" stroke="#2e8b3d"/>
+    </g>
+    <g font-size="11.5" text-anchor="middle">
+      <text x="54" y="26" class="k" font-size="13" font-weight="bold">1. Requirements</text>
+      <text x="54" y="43">Residency rule</text><text x="54" y="57">(process in EU)</text>
+
+      <text x="168" y="26" class="k" font-size="13" font-weight="bold">2. Design</text>
+      <text x="168" y="43">Pick Bedrock for</text><text x="168" y="57">AWS compliance</text>
+
+      <text x="282" y="26" class="k" font-size="13" font-weight="bold">3. Test</text>
+      <text x="282" y="43">Author eval suite</text><text x="282" y="57">&amp; judge rubric</text>
+
+      <text x="396" y="26" class="r" font-size="13" font-weight="bold">4. Deploy ★</text>
+      <text x="396" y="43">Pin full model ID,</text><text x="396" y="57">keep prior, gate eval</text>
+
+      <text x="510" y="26" class="k" font-size="13" font-weight="bold">5. Operate</text>
+      <text x="510" y="43">Instrument token</text><text x="510" y="57">cost &amp; latency/call</text>
+
+      <text x="282" y="92" class="r" font-size="14">Exam trap: writing the eval is TEST; gating promotion on its score is DEPLOY!</text>
+    </g>
+  </svg>
+
+  <h2>4 · Deployment Platforms &amp; Versioning What Ships</h2>
+  <div class="row">
+    <div>
+      <p>The same Claude model can run on <b class="dk">6 deployment platforms</b>, differing in identity, data residency, latency, and billing:</p>
+      <ul>
+        <li><b class="dk">First-Party Claude API</b> (Anthropic API key; quickest direct access, newest features first).</li>
+        <li><b class="dk">Claude Platform on AWS</b> · <b class="dk">Claude in Amazon Bedrock</b> (AWS IAM identity, VPC/CloudTrail, AWS compliance boundary) · <b class="dk">Claude on Bedrock (legacy)</b>.</li>
+        <li><b class="dk">Google Vertex AI</b> (GCP IAM identity, GCP residency &amp; billing boundary) · <b class="dk">Third-party platforms</b>.</li>
+      </ul>
+      <div class="grid2" style="margin-top:4px">
+        <div class="box sm" style="border-color:#c0392b"><b class="dk">✘ Moving Alias (<span class="code">"opus"</span> / <span class="code">"sonnet"</span>)</b><br>Points to “current recommended” snapshot; updates over time &amp; differs across platforms → <span class="hlp">silent overnight prod drift!</span></div>
+        <div class="box sm" style="border-color:#2e8b3d"><b class="dk">✔ Pinned Full Model ID + Rollback</b><br>e.g. <span class="code">"us.anthropic.claude-opus-4-8"</span> + <span class="hl">retain_previous_pinned_version=True</span> + gate promotion on eval score.</div>
+      </div>
+    </div>
+    <div class="note b">Checkpoint 5 AWS bank: Amazon Bedrock + AWS IAM ref + pinned ID + retain prior version.</div>
+  </div>
+
+  <h2>5 · Comparing Platforms: Latency, Compliance &amp; Cost</h2>
+  <div class="row">
+    <div>
+      <ul>
+        <li><b class="dk">Latency:</b> measure from the <span class="hl">customer's deployment region</span>, NEVER from your dev laptop (180ms laptop trace hid an EU residency violation!). Regional vs global endpoints trade residency against capacity routing.</li>
+        <li><b class="dk">Compliance &amp; Data Residency:</b> for regulated customers, residency is <b class="dk">pass/fail</b> (hard gate, not a trade-off). Pick the platform where the customer already holds its compliance posture &amp; regional boundary.</li>
+        <li><b class="dk">Cost:</b> compare <b class="dk">total cost per call</b> (input/output tokens + caching discount + batch discount + platform egress/overhead), not raw token price alone.</li>
+      </ul>
+    </div>
+    <div class="note">Checkpoint 6 Trace: rejected on EU residency → remeasure from EU-west &amp; switch to EU-resident platform!</div>
+  </div>
+  <div class="pn">— 2 —</div>
+</section>
+
+<!-- ======================= PAGE 3 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">6 · Multi-Component Apps &amp; Trust Boundaries</h2>
+  <div class="row">
+    <div>
+      <p>When an app chains components across environments (<span class="code">API → Claude Code task → MCP server</span>), <span class="hl">the app is only as contained as its weakest seam</span>. Trust does NOT carry over from the sending component!</p>
+      <svg viewBox="0 0 565 110" style="margin-top:4px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 18 Q72 14 138 19 L139 76 Q72 80 5 75 Z"/>
+          <path d="M210 18 Q282 14 354 19 L355 76 Q282 80 209 75 Z"/>
+          <path d="M424 18 Q490 14 556 19 L557 76 Q490 80 423 75 Z" stroke="#7a3fb0"/>
+          <path d="M142 47 L205 47" marker-end="url(#ah)"/>
+          <path d="M358 47 L419 47" marker-end="url(#ah)"/>
+          <path d="M174 8 L173 88" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="4 3"/>
+          <path d="M389 8 L388 88" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="4 3"/>
+        </g>
+        <g font-size="12" text-anchor="middle">
+          <text x="72" y="42" class="k" font-weight="bold">Claude Code Task</text>
+          <text x="72" y="58" font-size="11">fetches customer_page</text>
+          <text x="174" y="102" class="r">Seam 1: treat_as_data(fetched)</text>
+
+          <text x="282" y="42" class="k" font-weight="bold">Next Model Call</text>
+          <text x="282" y="58" font-size="11">processes wrapped data</text>
+          <text x="389" y="102" class="r">Seam 2: least_privilege_read_only</text>
+
+          <text x="490" y="42" class="k" font-weight="bold">MCP Server</text>
+          <text x="490" y="58" font-size="11">reaches customer_db</text>
+        </g>
+      </svg>
+      <ul>
+        <li><b class="dk">Seam 1 (Untrusted Content Boundary):</b> wrap fetched output with <span class="code">treat_as_data(fetched)</span> so the next component never executes embedded instructions.</li>
+        <li><b class="dk">Seam 2 (Most Privileged Component):</b> scope the MCP server to <span class="code">least_privilege_read_only</span> (never <span class="code">full_access</span>). If a seam cannot be secured programmatically, assign a <b class="dk">human approval gate</b>.</li>
+      </ul>
+    </div>
+    <div class="note">Passing fetched content straight into next_call() lets a web page drive your DB!</div>
+  </div>
+
+  <h2>7 · Cumulative Task: Diagnose &amp; Assemble the Deployment</h2>
+  <div class="grid2" style="margin-top:4px">
+    <div class="box red">
+      <b class="dk">✘ Shipped Accelerator (3 Planted Defects)</b>
+<pre># Packaged accelerator for regulated AWS customer
+def build_agent():
+    return Agent(
+        model="opus",             # Defect 2: alias!
+        system_prompt=SYSTEM_PROMPT,
+        repo_path="/home/acme/checkout", # Defect 1!
+        tools=[read_file, run_linter],
+    )
+deploy(platform="amazon_bedrock",
+       identity=aws_role_arn)     # No rollback!
+fetched = code_task.run(fetch_url=customer_page)
+next_call(input=fetched)          # Defect 3: raw!</pre>
+    </div>
+    <div class="box" style="border-color:#2e8b3d">
+      <b class="dk">✔ Corrected &amp; Verified Deployment</b>
+<pre>def build_agent(repo_path):       # Fix 1: param
+    return Agent(
+        model="us.anthropic.claude-opus-4-8", # Fix 2a
+        system_prompt=SYSTEM_PROMPT,
+        repo_path=repo_path,
+        tools=[read_file, run_linter],
+    )
+deploy(platform="amazon_bedrock", identity=aws_role_arn,
+       retain_previous_pinned_version=True) # Fix 2b
+fetched = code_task.run(fetch_url=customer_page)
+next_call(input=treat_as_data(fetched))     # Fix 3
+assert eval_suite.run(
+    model="us.anthropic.claude-opus-4-8") >= baseline_score</pre>
+    </div>
+  </div>
+
+  <h2>8 · Full Developer Path &amp; Module 5 Cheat-Sheet</h2>
+  <div class="grid3">
+    <div class="box sm"><b class="dk">M1 · MSO Foundations</b><br>Tokens, fixed context window, sampling, model tiers ⟂ thinking, sync/stream/async/batch.</div>
+    <div class="box sm"><b class="dk">M2 · Prompting &amp; Agents</b><br>Structured JSON, thinking carry-back, tool schemas, SSE recovery, context compaction, human gates.</div>
+    <div class="box sm"><b class="dk">M3 · Claude Code &amp; MCP</b><br>Permission modes, CLAUDE.md/rules/hooks/subagents, portable skills/plugins, MCP transport &amp; auth.</div>
+  </div>
+  <div class="box dash" style="line-height:20px;font-size:14.5px;padding:5px 12px;margin-top:6px">
+    <b class="dk">Module 5 Takeaways:</b> ① <b class="dk">Package while fresh:</b> parameterize customer values, document assumptions, bundle eval + audit log · ② <b class="dk">Maintainer readiness:</b> right repo/Cookbook channel + focused code + runnable example + test + assumptions + <span class="hl">IP/licensing rights check</span> · ③ <b class="dk">Pin what ships:</b> full platform model ID (<span class="code">us.anthropic.claude-opus-4-8</span>) + retain prior version + gate on eval score · ④ <b class="dk">Measure the deciding constraint:</b> latency from customer's region, pass/fail residency compliance, total cost per call · ⑤ <b class="dk">Mark every seam as a boundary:</b> <span class="code">treat_as_data()</span> on fetched content + <span class="code">least_privilege_read_only</span> on privileged MCP servers.
+  </div>
+  <div class="pn">— 3 —</div>
+</section>
+
+</body>
+</html>

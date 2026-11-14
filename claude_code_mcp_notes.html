@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Module 3 – Claude Code, MCP & Integration (Study Notes)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #d9d7d2;
+    font-family: 'Patrick Hand', 'Caveat', cursive;
+    color: #1a4cb0;
+    font-size: 15.5px;
+    line-height: 22px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    margin: 12px auto;
+    padding: 30px 24px 24px 70px;
+    overflow: hidden;
+    background-color: #fbfaf7;
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 21px, rgba(70,130,215,.30) 21px, rgba(70,130,215,.30) 22px);
+    background-position: 0 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    page-break-after: always;
+    break-after: page;
+  }
+  .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: 56px; width: 2px; background: rgba(232,105,135,.75); }
+  .page::after { content: ""; position: absolute; top: 0; bottom: 0; left: 60px; width: 1px; background: rgba(232,105,135,.35); }
+  .holes { position:absolute; left:14px; top:0; bottom:0; width:20px; }
+  .holes i { position:absolute; left:0; width:18px; height:18px; border-radius:50%; background:#d9d7d2; box-shadow: inset 1px 2px 3px rgba(0,0,0,.35); }
+  @media print { body { background: none; } .page { margin: 0; box-shadow: none; } }
+  h1, h2, h3 { font-family: 'Caveat', cursive; color: #2d2d2d; margin: 0; font-weight: 700; line-height: 1; }
+  h1 { font-size: 38px; transform: rotate(-.6deg); }
+  h2 { font-size: 29px; margin-top: 10px; transform: rotate(-.4deg); }
+  h3 { font-size: 21px; margin-top: 4px; }
+  p { margin: 0; }
+  ul { margin: 0; padding-left: 20px; list-style: none; }
+  li { position: relative; margin: 0; }
+  li::before { content: "✦"; position: absolute; left: -16px; font-size: 11px; color: #1a4cb0; top: 1px; }
+  .hl { background: linear-gradient(transparent 12%, rgba(255,226,40,.6) 12%, rgba(255,226,40,.6) 92%, transparent 92%); padding: 0 2px; border-radius: 3px; }
+  .hlg { background: linear-gradient(transparent 12%, rgba(120,220,120,.45) 12%, rgba(120,220,120,.45) 92%, transparent 92%); padding: 0 2px; }
+  .hlp { background: linear-gradient(transparent 12%, rgba(255,150,190,.45) 12%, rgba(255,150,190,.45) 92%, transparent 92%); padding: 0 2px; }
+  .dk { color: #2d2d2d; }
+  .row { display: grid; grid-template-columns: 1fr 126px; gap: 12px; margin-top: 4px; }
+  .note { font-family: 'Caveat', cursive; font-size: 17px; line-height: 17px; color: #c0392b; transform: rotate(-2deg); padding: 3px 2px 3px 8px; border-left: 2px dashed #c0392b; align-self: start; margin-top: 4px; }
+  .note.b { transform: rotate(1.8deg); color: #7a3fb0; border-color:#7a3fb0; }
+  .box { border: 2px solid #2d2d2d; padding: 4px 10px; margin: 6px 0; border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px; background: rgba(255,255,255,.25); }
+  .box.dash { border-style: dashed; }
+  .box.red { border-color: #c0392b; }
+  .code { font-family: 'Patrick Hand', cursive; color: #2d2d2d; background: rgba(0,0,0,.04); padding: 0 4px; border-radius: 3px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+  .box.sm { padding: 2px 8px; margin: 3px 0; line-height: 20px; }
+  .title-wrap { margin-bottom: 2px; }
+  .sub { font-family:'Caveat',cursive; font-size: 19px; color:#c0392b; line-height: 22px; }
+  svg { display:block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: 'Patrick Hand', cursive; fill: #1a4cb0; }
+  svg text.k { fill:#2d2d2d; }
+  svg text.r { fill:#c0392b; font-family:'Caveat',cursive; font-size:16px; }
+  .pn { position:absolute; bottom: 8px; right: 30px; font-family:'Caveat',cursive; font-size:17px; color:#777; }
+  .tape { position:absolute; top:-6px; right:60px; width:90px; height:24px; background: rgba(255,225,120,.55); transform: rotate(4deg); border-left:2px dotted rgba(0,0,0,.15); border-right:2px dotted rgba(0,0,0,.15);}
+  pre { margin:2px 0 0; font-family:'Patrick Hand',cursive; font-size:14.5px; line-height:19px; color:#2d2d2d; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#1a4cb0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+</svg>
+
+<!-- ======================= PAGE 1 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+  <div class="tape"></div>
+
+  <div class="title-wrap">
+    <h1>Claude Code, MCP &amp; Integration</h1>
+    <div class="sub">Module 3 · make it configurable, shareable &amp; safe — beyond <u>your</u> machine</div>
+    <svg viewBox="0 0 560 10" style="height:10px"><g filter="url(#rough)"><path d="M4 5 Q60 1 120 5 T240 5 T360 4 T470 6 T556 3" fill="none" stroke="#2d2d2d" stroke-width="2" stroke-linecap="round"/></g></svg>
+  </div>
+  <p>Theme: it works on my machine ✔ → for teammates / prod / auditors <span class="hl">each convenience becomes a failure</span>: wrong mode, buried rule, local path, committed key, staging-only OAuth.</p>
+
+  <h2>1 · Permission modes &amp; human gates</h2>
+  <div class="row">
+    <div>
+      <p>Claude Code runs the same agent loop (Module 2) + a <span class="hl">permission layer</span>. Flow: <b class="dk">explore → plan → code</b>.</p>
+      <svg viewBox="0 0 565 84" style="margin-top:2px">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 8 Q75 4 144 9 L145 46 Q75 50 5 45 Z"/><path d="M212 8 Q280 5 348 9 L349 46 Q280 50 211 45 Z"/><path d="M418 9 Q490 5 558 8 L559 47 Q490 50 419 45 Z"/>
+          <path d="M150 28 Q180 24 208 29" marker-end="url(#ah)"/><path d="M354 28 Q385 24 414 28" marker-end="url(#ah)"/>
+          <path d="M8 56 Q140 66 350 56" stroke="#c0392b"/>
+        </g>
+        <g font-size="14" text-anchor="middle">
+          <text x="75" y="33" class="k">explore</text><text x="280" y="33" class="k">plan (you approve)</text><text x="488" y="33" class="k">code / run</text>
+          <text x="180" y="78" class="r">plan mode = frozen here: no edits, no shell</text>
+        </g>
+      </svg>
+    </div>
+    <div class="note">Plan mode = good default for unfamiliar / high-stakes code.</div>
+  </div>
+
+  <svg viewBox="0 0 565 132" style="margin-top:2px">
+    <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 40 Q280 33 555 40" /><path d="M545 30 L556 40 L543 50"/>
+      <path d="M12 26 Q14 40 11 54 M122 27 L123 53 M232 27 L231 53 M342 26 L343 54 M452 27 L451 53" stroke="#2d2d2d"/>
+      <path d="M440 30 L452 50 M452 30 L440 50" stroke="#c0392b" stroke-width="3" style="display:none"/>
+      <path d="M8 88 Q150 82 290 89 L291 122 Q150 126 7 120 Z" stroke="#7a3fb0"/>
+    </g>
+    <g font-size="12.5" text-anchor="middle">
+      <text x="12" y="14" class="k">plan</text><text x="12" y="75" font-size="11.5">reads only</text>
+      <text x="122" y="14" class="k">default</text><text x="122" y="75" font-size="11.5">asks ~everything</text>
+      <text x="232" y="14" class="k">acceptEdits</text><text x="232" y="75" font-size="11.5">edits+mkdir/rm/mv</text>
+      <text x="342" y="14" class="k">auto</text><text x="342" y="75" font-size="11.5">classifier gates</text>
+      <text x="505" y="14" class="r">bypassPermissions</text><text x="505" y="75" font-size="11.5">NO checks, no guard</text>
+      <text x="150" y="105" class="k" style="font-size:13.5px">dontAsk (locked-down CI)</text>
+      <text x="150" y="119" font-size="11.5">only allow-listed tools; DENIES the rest</text>
+      <text x="420" y="104" class="r" style="font-size:15px">more autonomy →  less oversight</text>
+      <text x="420" y="120" font-size="11.5">bypass: ONLY in disposable container/VM</text>
+    </g>
+  </svg>
+  <div class="row">
+    <div>
+      <ul>
+        <li><b class="dk">acceptEdits</b>: scoped to <i>inside working dir</i>; protected paths + other shell cmds still prompt.</li>
+        <li><b class="dk">auto</b> (research preview): blocks prod deploys, mass deletes, cred exfil, force-push main. Reduces prompts ≠ guarantees safety.</li>
+        <li>Want fewer prompts safely? use <span class="hlg">auto</span>, never bypass on a workstation.</li>
+      </ul>
+    </div>
+    <div class="note b">bypass also skips the protected-path guard!</div>
+  </div>
+
+  <h3>Where settings live (higher = harder to override)</h3>
+  <div class="row">
+    <div>
+      <svg viewBox="0 0 565 112">
+        <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M150 6 Q282 3 414 7 L413 28 Q282 31 151 27 Z" stroke="#c0392b"/>
+          <path d="M110 34 Q282 31 454 35 L453 56 Q282 59 111 55 Z"/>
+          <path d="M70 62 Q282 59 494 63 L493 84 Q282 88 71 83 Z"/>
+          <path d="M30 90 Q282 87 534 91 L533 110 Q282 113 31 109 Z"/>
+        </g>
+        <g font-size="12.5" text-anchor="middle">
+          <text x="282" y="22" class="k">ENTERPRISE managed-settings.json — users can't override</text>
+          <text x="282" y="50">PROJECT .claude/settings.json — committed, whole team</text>
+          <text x="282" y="78">LOCAL .claude/settings.local.json — yours, git-ignored</text>
+          <text x="282" y="104">USER ~/.claude/settings.json — every project on machine</text>
+        </g>
+      </svg>
+      <p><span class="hl">Deny always beats allow</span>, in every mode (even bypass). Enterprise deny = most durable governance.</p>
+    </div>
+    <div class="note">Rules stack on the mode: mode = default for session, rules = exceptions.</div>
+  </div>
+
+  <h3>Where the human gate goes: “worst case if unchecked?”</h3>
+  <div class="grid3">
+    <div class="box sm" style="border-color:#2e8b3d"><b class="dk">No gate</b><br>low-cost, reversible: formatting, in-dir edits (acceptEdits)</div>
+    <div class="box sm" style="border-color:#c0392b"><b class="dk">Gate</b><br>hard to undo / sensitive path / outside dir / destructive shell → deny rule or default/plan</div>
+    <div class="box sm" style="border-color:#7a3fb0"><b class="dk">Human must merge</b><br>code marked sensitive: agent = input, never the only gate</div>
+  </div>
+  <div class="box dash sm"><b class="dk">Postmortem:</b> bypass for “just renaming endpoints”; pattern <span class="code">/v1/legacy/</span> also matched <span class="code">/deploy/config/prod/</span>; cleanup.sh deleted prod configs with zero prompts. <span class="hl">Set deny on sensitive dirs BEFORE changing mode.</span> Checkpoint 1 recipe: acceptEdits + deny <span class="code">Bash(rm:*)</span>, <span class="code">Bash(git push:*)</span>, <span class="code">Read(.env.production)</span>.</div>
+  <div class="pn">— 1 —</div>
+</section>
+
+<!-- ======================= PAGE 2 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">2 · Durable project context</h2>
+  <p>Permissions = what the agent <i>may do</i>. This section = what it <i>knows</i> &amp; how it <i>behaves</i> next session.</p>
+
+  <div class="row">
+    <div>
+      <h3>CLAUDE.md — loaded every session</h3>
+      <ul>
+        <li><span class="code">/init</span> makes a starter file → validate &amp; trim.</li>
+        <li>Keep ONLY behaviour-changing rules: test cmds, conventions, off-limits paths.</li>
+        <li><span class="hlp">Bigger file = each rule weighs less.</span> 847-line file → agent edited <span class="code">/legacy/tokens/</span> despite line 347 saying don't. History/archives → separate docs or Skills.</li>
+        <li>The rule you can't afford to lose → a <b class="dk">hook</b>.</li>
+      </ul>
+    </div>
+    <div class="note">Past a few hundred lines? audit &amp; move out.</div>
+  </div>
+
+  <div class="row">
+    <div>
+      <h3>Rules files — <span class="code">.claude/rules/</span></h3>
+      <p>Path-scoped guidance via YAML <span class="code">paths:</span> glob (e.g. <span class="code">src/db/**/*.sql</span>) → loads only when matching files are touched.</p>
+      <p><span class="hlp">No <span class="code">paths</span> field = loads at launch like CLAUDE.md</span> (subfolders are just organisation).</p>
+    </div>
+    <div class="note b">Universal → CLAUDE.md. Local to one area → rules file.</div>
+  </div>
+
+  <h3>Hooks — your script at a lifecycle event (fires EVERY time)</h3>
+  <svg viewBox="0 0 565 150">
+    <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 8 Q38 5 76 9 L77 42 Q38 45 3 41 Z"/>
+      <path d="M86 9 Q122 5 160 8 L161 43 Q122 46 87 42 Z"/>
+      <path d="M170 8 Q206 6 244 9 L245 42 Q206 46 171 41 Z" stroke="#c0392b"/>
+      <path d="M254 9 Q290 5 328 8 L329 42 Q290 45 255 42 Z" stroke-dasharray="4 3"/>
+      <path d="M338 8 Q374 6 412 9 L413 43 Q374 46 339 41 Z" stroke="#2e8b3d"/>
+      <path d="M422 9 Q458 5 496 8 L497 42 Q458 45 423 41 Z"/>
+      <path d="M506 8 Q530 6 563 9 L563 43 Q530 46 507 42 Z"/>
+      <path d="M207 50 Q209 68 206 82" stroke="#c0392b" marker-end="url(#ah)"/>
+      <path d="M375 50 Q377 68 374 82" stroke="#2e8b3d" marker-end="url(#ah)"/>
+    </g>
+    <g font-size="10.5" text-anchor="middle">
+      <text x="39" y="29" class="k">Session</text><text x="39" y="40" class="k">Start</text>
+      <text x="123" y="23" class="k">UserPrompt</text><text x="123" y="35" class="k">Submit</text>
+      <text x="207" y="29" class="k">PreToolUse</text>
+      <text x="291" y="29">tool runs</text>
+      <text x="375" y="29" class="k">PostToolUse</text>
+      <text x="459" y="29" class="k">Stop</text>
+      <text x="535" y="23" class="k">Session</text><text x="535" y="35" class="k">End</text>
+    </g>
+    <g font-size="12.5" text-anchor="middle">
+      <text x="207" y="99" class="r" style="font-size:15px">BLOCK: exit code 2 +</text><text x="207" y="114">reason on stderr → agent sees it</text>
+      <text x="375" y="99" style="font-size:14px" class="k">can't block (already ran)</text><text x="375" y="114">formatter · tests · AUDIT log</text>
+      <text x="282" y="140" class="r" style="font-size:15px">Notification = permission asked / 60s idle → route to Slack/log</text>
+    </g>
+  </svg>
+  <div class="box sm">CLAUDE.md “run Prettier” = followed <i>most</i> of the time. Hook = <span class="hl">every time</span>, any mode. <b class="dk">Guardrail vs convention.</b> Checkpoint 2: <span class="code">PreToolUse</span>, matcher <span class="code">Read</span>, script exits 2 on <span class="code">.env.production</span>.</div>
+
+  <h3>Subagents — isolated context, return only a summary</h3>
+  <div class="row">
+    <div>
+      <ul>
+        <li>Start clean: no main history, no accumulated files.</li>
+        <li><span class="hlp">Built-in Explore &amp; Plan SKIP CLAUDE.md + git status</span> (speed) → your project rules aren't there. Need the rules? use <b class="dk">general-purpose</b> or a custom subagent.</li>
+        <li>Custom subagent (<span class="code">.claude/agents</span>) doesn't see skills → list them in its frontmatter. Built-ins have no preloaded skills.</li>
+        <li>Best for exploration &amp; parallelisable work.</li>
+      </ul>
+    </div>
+    <div class="note">Rule ignored by a subagent? check what it actually loaded.</div>
+  </div>
+
+  <h3>Which mechanism carries which knowledge?</h3>
+  <div class="grid4">
+    <div class="box sm"><b class="dk">CLAUDE.md</b> – always; persistent cost, dilutes. Universal constraints.</div>
+    <div class="box sm"><b class="dk">Rules file</b> – path-triggered (if scoped). Narrow guidance.</div>
+    <div class="box sm"><b class="dk">Hook</b> – at event; ~0 context. Enforced guardrails, audit.</div>
+    <div class="box sm"><b class="dk">Subagent</b> – delegated; summary only. Exploration, parallel work.</div>
+  </div>
+  <div class="box dash sm"><b class="dk">Handles well:</b> projects revisited across many sessions. <b class="dk">Skip</b> for one-off tasks – setup overhead isn't worth it.</div>
+  <div class="pn">— 2 —</div>
+</section>
+
+<!-- ======================= PAGE 3 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">3 · Packaging workflows: skills, commands, plugins</h2>
+  <p>Goal: teammate gets your setup in <span class="hl">one install</span>, not a page of manual steps.</p>
+
+  <h3>Skill = SKILL.md (front matter + steps), author once…</h3>
+  <p>…but each runtime <b class="dk">loads &amp; sandboxes it differently</b>:</p>
+  <div class="grid2" style="margin-top:3px">
+    <div class="box sm"><b class="dk">Claude Code</b><br>found in <span class="code">.claude/skills</span>; loads on description match or <span class="code">/name</span>; runs in your terminal under mode + deny rules.</div>
+    <div class="box sm"><b class="dk">Messages API</b><br>sent with request; runs in <i>code-exec container</i>, NOT your machine. Needs <span class="code">code-execution</span> + <span class="code">skills</span> beta headers.</div>
+    <div class="box sm"><b class="dk">Agent SDK</b><br>runs in your process; skills load ONLY if <span class="hlp">settingSources</span> set explicitly (else skill silently does nothing).</div>
+    <div class="box sm"><b class="dk">Managed Agents</b><br>skill listed on the agent resource; Anthropic sandbox; beta header <span class="code">managed-agents-2026-04-01</span>; no ZDR/HIPAA.</div>
+  </div>
+
+  <div class="row">
+    <div>
+      <h3>3 portability rules</h3>
+      <ul>
+        <li><b class="dk">Description = matching criterion</b> – vague one fails everywhere.</li>
+        <li><b class="dk">No local-filesystem/tool assumptions</b> in the body (breaks in container). Or document them.</li>
+        <li><b class="dk">Subagents don't inherit skills</b> – list explicitly.</li>
+      </ul>
+    </div>
+    <div class="note b">“Runs everywhere” is designed for, not automatic.</div>
+  </div>
+
+  <h3>Explicit entry points</h3>
+  <ul>
+    <li>Skills are now the recommended format for BOTH auto &amp; explicit use: <span class="code">/skill-name</span>. <span class="code">disable-model-invocation: true</span> = manual-only workflow. <span class="code">.claude/commands/</span> = legacy.</li>
+    <li>Plugin commands are <span class="hl">namespaced</span>: plugin <span class="code">payments</span> + <span class="code">run-tests</span> → <span class="code">/payments:run-tests</span>. Rename plugin = rename every command.</li>
+  </ul>
+
+  <h3>Plugin = versioned bundle, shared via marketplace</h3>
+  <svg viewBox="0 0 565 128">
+    <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 8 Q125 3 244 9 L245 118 Q125 124 5 117 Z" stroke="#2d2d2d"/>
+      <path d="M18 34 Q60 31 100 35 L101 56 Q60 59 19 55 Z"/><path d="M114 35 Q160 31 232 34 L233 56 Q160 59 115 55 Z"/>
+      <path d="M18 68 Q60 65 100 69 L101 90 Q60 93 19 89 Z"/><path d="M114 69 Q160 65 232 68 L233 90 Q160 93 115 89 Z"/>
+      <path d="M252 62 Q290 58 326 63" marker-end="url(#ah)"/>
+      <path d="M332 30 Q380 26 428 31 L429 96 Q380 100 333 95 Z"/>
+      <path d="M436 62 Q470 58 500 63" marker-end="url(#ah)"/>
+      <path d="M506 40 Q530 36 556 41 L557 84 Q530 88 507 83 Z"/>
+    </g>
+    <g font-size="12.5" text-anchor="middle">
+      <text x="125" y="24" class="k">PLUGIN (+ manifest)</text>
+      <text x="60" y="50">skills</text><text x="173" y="50">hooks</text><text x="60" y="84">subagents</text><text x="173" y="84">MCP servers</text>
+      <text x="380" y="58" class="k">marketplace</text><text x="380" y="75" font-size="11.5">/plugin marketplace</text><text x="380" y="88" font-size="11.5">add owner/repo</text>
+      <text x="531" y="57" class="k">team</text><text x="531" y="73" font-size="11.5">1 install</text>
+      <text x="282" y="122" class="r" style="font-size:14.5px">enterprise: managed marketplace allowlist + extraKnownMarketplaces (allowlist alone doesn't auto-register)</text>
+    </g>
+  </svg>
+  <div class="row">
+    <div>
+      <ul>
+        <li><b class="dk">Skill</b> – on-demand procedure · <b class="dk">Command</b> – explicit trigger · <b class="dk">Plugin</b> – share/version across team.</li>
+        <li><span class="hlp">Risk:</span> a guardrail (deny rule/hook) you relied on locally is NOT in the bundle unless you list it.</li>
+        <li>Managed-scope plugins outrank user/project settings.</li>
+      </ul>
+    </div>
+    <div class="note">Cost: pay setup once (plugin) vs every dev by hand.</div>
+  </div>
+
+  <div class="box red"><b class="dk">Postmortem – “installed ✔, failed for everyone”:</b> SKILL.md ran <span class="code">/Users/alexmorgan/projects/deploy-utils/validate.sh</span> (absolute path) + silently needed <span class="code">DEPLOY_TOKEN</span> from author's shell → 3 people, 2 hours. Install copies files; <i>execution</i> resolves paths.</div>
+  <div class="box dash sm"><b class="dk">Fix:</b> <span class="hl">$CLAUDE_PROJECT_DIR/scripts/validate.sh</span> (project scripts) · <span class="hl">${CLAUDE_PLUGIN_ROOT}</span> (bundled scripts) · bundle every dependency · document + validate env vars at install · <b>test on a clean machine</b>.</div>
+  <div class="pn">— 3 —</div>
+</section>
+
+<!-- ======================= PAGE 4 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">4 · Building &amp; configuring MCP servers</h2>
+  <p>MCP server = a <i>process</i> that exposes capabilities; build once, <span class="hl">every MCP client</span> reuses it (Claude Code has a built-in client).</p>
+  <div class="grid3" style="margin-top:3px">
+    <div class="box sm"><b class="dk">Tools</b><br>actions the model calls</div>
+    <div class="box sm"><b class="dk">Resources</b><br>read-only data fetched by address into context (direct = fixed URI, templated = has parameter). Client support varies.</div>
+    <div class="box sm"><b class="dk">Prompts</b><br>vetted instruction templates invoked by name; maintained in one place.</div>
+  </div>
+
+  <h3>Transport = where the server runs</h3>
+  <svg viewBox="0 0 565 112">
+    <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 30 Q70 26 134 31 L135 74 Q70 78 5 73 Z"/>
+      <path d="M232 6 Q300 3 368 7 L369 38 Q300 42 231 37 Z"/>
+      <path d="M232 62 Q300 58 368 63 L369 96 Q300 100 231 95 Z"/>
+      <path d="M140 44 Q185 30 228 24" marker-end="url(#ah)"/>
+      <path d="M140 62 Q185 76 228 78" marker-end="url(#ah)"/>
+      <path d="M375 22 Q430 20 470 22" />
+      <path d="M375 80 Q440 84 495 80" marker-end="url(#ah)"/>
+      <path d="M496 62 Q525 58 557 63 L558 98 Q525 102 497 97 Z"/>
+    </g>
+    <g font-size="13" text-anchor="middle">
+      <text x="70" y="50" class="k">Claude Code</text><text x="70" y="66" font-size="11.5">(MCP client)</text>
+      <text x="300" y="27" class="k">stdio</text><text x="300" y="38" font-size="0">x</text>
+      <text x="505" y="26" font-size="12">subprocess on same machine</text>
+      <text x="300" y="82" class="k">HTTP (Streamable)</text>
+      <text x="527" y="82" font-size="12">remote</text><text x="527" y="95" font-size="11">shared / hosted</text>
+      <text x="170" y="108" class="r" style="font-size:14px">SSE = legacy, don't use for new servers</text>
+    </g>
+  </svg>
+  <p>Context cost: each server adds tool defs. Claude Code <b class="dk">defers</b> them &amp; searches for tools on demand (opt-in: load upfront if &lt;≈10% of window). Connect only what you need.</p>
+
+  <h3>Config scope = who loads it</h3>
+  <div class="grid2" style="margin-top:3px">
+    <div class="box sm"><b class="dk">Local</b> – <span class="code">~/.claude.json</span> under this project; only you, one project.</div>
+    <div class="box sm"><b class="dk">User</b> – your personal settings; all your projects; not shared.</div>
+    <div class="box sm"><b class="dk">Project</b> – <span class="code">.mcp.json</span> in repo root; teammates get it on clone. stdio ⇒ each machine needs the runtime (e.g. Node).</div>
+    <div class="box sm"><b class="dk">Enterprise</b> – admin-managed; pushed to all; locked.</div>
+  </div>
+  <div class="row">
+    <div>
+      <ul>
+        <li>Per-tool rules: <span class="code">mcp__server__tool</span> – allow <span class="code">mcp__github__create_issue</span>, deny a write tool; deny beats allow.</li>
+        <li><b class="dk">permission rule</b> = may it RUN (governance) · <b class="dk">enabled flag</b> (API <span class="code">mcp_toolset</span>) = does model SEE it (context/scope).</li>
+        <li>stdio can't be “shared” via .mcp.json → looks shareable, isn't a remote service.</li>
+      </ul>
+    </div>
+    <div class="note b">Transport ⟂ scope, but pick transport first.</div>
+  </div>
+
+  <h3>GitHub vs Linear — same transport, different auth</h3>
+  <div class="grid2">
+    <div class="box sm"><b class="dk">GitHub MCP</b> (remote HTTP): Personal Access Token as Bearer header, via <span class="hl">env var</span> reference — service credential you store.</div>
+    <div class="box sm"><b class="dk">Linear MCP</b> (remote HTTP): <b>OAuth</b> – 401 → browser sign-in → token issued &amp; stored; nothing copied by hand.</div>
+  </div>
+  <div class="box red sm"><b class="dk">Leaked key:</b> inline <span class="code">Bearer sk-abc123…</span> in committed .mcp.json → in history, 3 teammates, CI runner. Overwriting ≠ removal → must ROTATE (broke 2 other services, 3 hrs). Use <span class="hl">Bearer ${WAREHOUSE_MCP_TOKEN}</span>. Backstop: CLAUDE.md rule + PreToolUse hook (exit 2) on .mcp.json writes with credential patterns.</div>
+
+  <h3>Prompt caching &amp; RAG (context-cost cousins)</h3>
+  <div class="row">
+    <div>
+      <ul>
+        <li><b class="dk">Caching</b>: <span class="code">cache_control: ephemeral</span> on last block to cache (≤4); order tools→system→messages; exact-match prefix; TTL 5 min (reset on read) or <span class="code">ttl: 1h</span>; min ≈1,024 tokens.</li>
+        <li><b class="dk">Classical RAG</b>: chunk → embed → index upfront, similarity match later. <b class="dk">Agentic search</b>: no index; model fetches live (like deferred MCP tool loading).</li>
+        <li>RAG scales flat but is <span class="hlp">only as good as what it finds</span> → descriptive file names, grouping.</li>
+      </ul>
+    </div>
+    <div class="note">Retrieval misses ⇒ model never sees it.</div>
+  </div>
+  <div class="pn">— 4 —</div>
+</section>
+
+<!-- ======================= PAGE 5 ======================= -->
+<section class="page">
+  <div class="holes"><i style="top:150px"></i><i style="top:520px"></i><i style="top:900px"></i></div>
+
+  <h2 style="margin-top:0">5 · Enterprise integration &amp; auth</h2>
+  <p>Prototype asks “does it connect?” Production asks: <span class="hl">who is it acting as · what data · where does it go · can admin lock it · is it logged?</span></p>
+
+  <svg viewBox="0 0 565 132" style="margin-top:3px">
+    <g filter="url(#rough)" fill="none" stroke="#1a4cb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M215 6 Q282 3 350 7 L351 32 Q282 36 214 31 Z"/>
+      <path d="M8 84 Q90 80 172 85 L173 124 Q90 128 7 123 Z"/>
+      <path d="M200 84 Q282 80 364 85 L365 124 Q282 128 199 123 Z"/>
+      <path d="M392 84 Q475 80 557 85 L558 124 Q475 128 391 123 Z"/>
+      <path d="M240 36 Q150 50 100 80" marker-end="url(#ah)"/>
+      <path d="M282 38 Q284 58 282 80" marker-end="url(#ah)"/>
+      <path d="M326 36 Q420 50 470 80" marker-end="url(#ah)"/>
+    </g>
+    <g font-size="12.5" text-anchor="middle">
+      <text x="282" y="25" class="k">what kind of service?</text>
+      <text x="100" y="103" class="k">remote + USER identity</text><text x="100" y="118" font-size="11.5">OAuth (401 → browser sign-in)</text>
+      <text x="282" y="103" class="k">remote + SERVICE identity</text><text x="282" y="118" font-size="11.5">API key via ENV VAR / secret store</text>
+      <text x="475" y="103" class="k">local (files, DB)</text><text x="475" y="118" font-size="11.5">stdio · fs perms + deny rules</text>
+    </g>
+  </svg>
+
+  <h3>Secrets: 3 practices</h3>
+  <div class="row">
+    <div>
+      <ul>
+        <li><b class="dk">Separate:</b> config holds a variable <i>reference</i>, value lives elsewhere (config gets committed/cloned).</li>
+        <li><b class="dk">Store:</b> env var injected at runtime for local/short-lived (CI secret); <b>secret store</b> if shared/auditable (one rotation updates all, logs who read).</li>
+        <li><b class="dk">Rotate:</b> on schedule + immediately after exposure; leaked ≠ re-secret-able. Works cleanly only if 1 &amp; 2 held.</li>
+        <li>Narrowest scope per credential · record which services use which key.</li>
+      </ul>
+    </div>
+    <div class="note b">Trace fix: rotate rejected key → inject as env var in CI → config references the var (Fix B).</div>
+  </div>
+
+  <h3>What regulated customers add</h3>
+  <div class="grid3">
+    <div class="box sm"><b class="dk">Lock config</b><br>enterprise managed settings (non-overridable)</div>
+    <div class="box sm"><b class="dk">Log access</b><br>PostToolUse hook → audit store, deterministic</div>
+    <div class="box sm"><b class="dk">Residency</b><br>regional HTTP endpoint + platform pinning</div>
+  </div>
+
+  <h3>Code modernization = the module in one job</h3>
+  <p>High blast radius, unfamiliar code, hard to reverse. Before starting ask:</p>
+  <div class="grid3">
+    <div class="box sm"><b class="dk">Blast radius?</b><br>what depends on it, what breaks downstream</div>
+    <div class="box sm"><b class="dk">Audited how?</b><br>PostToolUse log, reviewable</div>
+    <div class="box sm"><b class="dk">Who approves each phase?</b><br>define &amp; document it first</div>
+  </div>
+  <p style="margin-top:3px">Toolkit: <b class="dk">plan mode</b> for read-only review · <b class="dk">hooks</b> block sensitive paths · <b class="dk">CLAUDE.md</b> carries target-pattern conventions so it doesn't drift to legacy style.</p>
+
+  <div class="box red"><b class="dk">Postmortem – staging ✔, prod ✘:</b> OAuth redirect URIs are registered <i>per host</i>. Registered <span class="code">staging.mycompany.com</span> only → prod = “redirect URI mismatch” loop. Fix: add prod URI; regulated customers often need <span class="hl">separate OAuth apps per environment</span>; add to deployment checklist.</div>
+
+  <h2>Cumulative fix: 3 bugs, 3 layers</h2>
+  <div class="grid3">
+    <div class="box sm"><b class="dk">settings.json</b><br>✘ <span class="code">bypassPermissions</span><br>✔ <span class="code">acceptEdits</span> + keep deny <span class="code">Read(.env.production)</span></div>
+    <div class="box sm"><b class="dk">SKILL.md</b><br>✘ <span class="code">/Users/priya/…sh</span><br>✔ <span class="code">${CLAUDE_PROJECT_DIR}/scripts/validate-migration.sh</span></div>
+    <div class="box sm"><b class="dk">.mcp.json</b><br>✘ inline <span class="code">sk-prod-…</span><br>✔ <span class="code">Bearer ${WAREHOUSE_TOKEN}</span> (+ rotate old key)</div>
+  </div>
+
+  <h3>Cheat-sheet: 7 takeaways</h3>
+  <div class="box dash" style="line-height:20px;font-size:14.5px;padding:4px 12px">
+    ① mode = risk decision, not speed; deny rules first · ② AI review = findings to triage; verify runtime claims; human gates on irreversible actions · ③ skills portable only by design (headers / settingSources / sandbox) · ④ right mechanism per concern: CLAUDE.md, rules, hooks, subagents · ⑤ plugins need relative paths, documented env vars, clean-machine test · ⑥ transport (where it runs) + scope (who loads it) must match · ⑦ enterprise: OAuth / env-var keys, audit hooks, managed config — before the security review.
+  </div>
+  <div class="pn">— 5 —</div>
+</section>
+
+</body>
+</html>
