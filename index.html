@@ -12,9 +12,144 @@
   html, body {
     margin: 0; padding: 0;
     height: 100%;
+    overflow: hidden;
     background: #c8c5be;
     font-family: 'Patrick Hand', 'Caveat', cursive;
     color: #2d2d2d;
+  }
+
+  /* App Shell */
+  .app-shell {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* Left Collapsible Side Panel */
+  .sidebar {
+    width: 265px;
+    min-width: 265px;
+    background: #1d2026;
+    color: #fbfaf7;
+    border-right: 3px solid #d97757;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left .22s ease;
+    z-index: 90;
+    box-shadow: 3px 0 12px rgba(0,0,0,.35);
+  }
+  .sidebar.collapsed {
+    margin-left: -265px;
+  }
+  .sidebar-header {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #323842;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-title {
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffd966;
+    letter-spacing: .4px;
+  }
+  .sidebar-sub {
+    font-size: 13px;
+    color: #a8adb7;
+  }
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .side-btn {
+    width: 100%;
+    text-align: left;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 15px;
+    padding: 9px 11px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: #2a2f38;
+    color: #e2e0db;
+    cursor: pointer;
+    transition: all .15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .side-btn:hover {
+    background: #373e4a;
+    transform: translateX(2px);
+  }
+  .side-btn.active {
+    background: #fbfaf7;
+    color: #1a4cb0;
+    border-color: #d97757;
+    box-shadow: 0 3px 8px rgba(0,0,0,.3);
+  }
+  .side-btn-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+  .side-tag {
+    font-family: 'Caveat', cursive;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 0 7px;
+    border-radius: 5px;
+    background: rgba(0,0,0,.28);
+    color: #ffd966;
+  }
+  .side-btn.active .side-tag {
+    background: #1a4cb0;
+    color: #fff;
+  }
+  .side-name {
+    font-weight: 700;
+    flex: 1;
+    line-height: 18px;
+  }
+  .side-pages {
+    font-family: 'Caveat', cursive;
+    font-size: 14px;
+    color: #d97757;
+  }
+  .side-btn.active .side-pages {
+    color: #c0392b;
+    font-weight: 700;
+  }
+  .side-desc {
+    font-size: 12.5px;
+    line-height: 15px;
+    color: #9da3ae;
+    padding-left: 2px;
+  }
+  .side-btn.active .side-desc {
+    color: #444;
+  }
+  .sidebar-footer {
+    padding: 10px 14px;
+    border-top: 1px solid #323842;
+    font-size: 13px;
+    color: #9da3ae;
+    line-height: 17px;
+  }
+
+  /* Main Column (Topbar + Content) */
+  .main-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 100vh;
   }
 
   /* Top Binder Bar */
@@ -24,7 +159,7 @@
     z-index: 100;
     background: #23272e;
     color: #fbfaf7;
-    padding: 8px 18px;
+    padding: 8px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -36,7 +171,20 @@
   .brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+  }
+  .toggle-side-btn {
+    background: #343a44;
+    color: #fbfaf7;
+    border: 1px solid #555d69;
+    border-radius: 6px;
+    padding: 4px 9px;
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .toggle-side-btn:hover {
+    background: #434b57;
   }
   .brand-badge {
     background: #d97757;
@@ -65,8 +213,8 @@
   }
   .tab-btn {
     font-family: 'Patrick Hand', cursive;
-    font-size: 15px;
-    padding: 6px 13px;
+    font-size: 14.5px;
+    padding: 5px 11px;
     border: 2px solid transparent;
     border-radius: 8px;
     background: #343a44;
@@ -133,8 +281,9 @@
 
   /* Views */
   .view-container {
-    height: calc(100vh - 55px);
+    flex: 1;
     overflow-y: auto;
+    min-height: 0;
   }
   #readerView {
     display: none;
@@ -297,44 +446,98 @@
   </defs>
 </svg>
 
-<!-- ======================= TOP NAVIGATION BAR ======================= -->
-<header class="topbar">
-  <div class="brand">
-    <span class="brand-badge">Claude Prep</span>
-    <span class="brand-title">Handwritten Study Notebook</span>
-  </div>
+<div class="app-shell">
 
-  <nav class="tabs" id="moduleTabs">
-    <button class="tab-btn active" data-target="index" onclick="selectModule('index')">
-      <span>📑 Binder Index</span>
-    </button>
-    <button class="tab-btn" data-target="m1" onclick="selectModule('m1')">
-      <span class="tab-tag">M1</span><span>MSO Foundations</span>
-    </button>
-    <button class="tab-btn" data-target="m2" onclick="selectModule('m2')">
-      <span class="tab-tag">M2</span><span>Prompting &amp; Agents</span>
-    </button>
-    <button class="tab-btn" data-target="m3" onclick="selectModule('m3')">
-      <span class="tab-tag">M3</span><span>Claude Code &amp; MCP</span>
-    </button>
-    <button class="tab-btn" data-target="m4" onclick="selectModule('m4')">
-      <span class="tab-tag">M4</span><span>Prod Eng, Evals &amp; Security</span>
-    </button>
-    <button class="tab-btn" data-target="m5" onclick="selectModule('m5')">
-      <span class="tab-tag">M5</span><span>Accelerators &amp; IP</span>
-    </button>
-  </nav>
+  <!-- ======================= LEFT SIDE PANEL ======================= -->
+  <aside class="sidebar" id="sidebarPanel">
+    <div class="sidebar-header">
+      <div>
+        <div class="sidebar-title">📚 Study Binder</div>
+        <div class="sidebar-sub">5 Modules · 18 Handwritten Pages</div>
+      </div>
+    </div>
 
-  <div class="controls">
-    <button class="ctrl-btn" id="prevModBtn" onclick="stepModule(-1)" disabled title="Previous Module (←)">← Prev</button>
-    <button class="ctrl-btn" id="nextModBtn" onclick="stepModule(1)" title="Next Module (→)">Next →</button>
-    <button class="ctrl-btn" id="printBtn" onclick="printCurrent()" title="Print / Save PDF">🖨 Print</button>
-    <a class="ctrl-btn" id="openRawLink" href="mso_foundations_notes.html" target="_blank" style="display:none" title="Open standalone HTML in new tab">↗ Standalone</a>
-  </div>
-</header>
+    <nav class="sidebar-nav" id="sideModuleNav">
+      <button class="side-btn active" data-target="index" onclick="selectModule('index')">
+        <div class="side-btn-top">
+          <span class="side-tag">📑</span>
+          <span class="side-name">Binder Cover &amp; Index</span>
+        </div>
+        <div class="side-desc">Overview, module map &amp; golden exam rules</div>
+      </button>
 
-<!-- ======================= MAIN VIEW AREA ======================= -->
-<div class="view-container">
+      <button class="side-btn" data-target="m1" onclick="selectModule('m1')">
+        <div class="side-btn-top">
+          <span class="side-tag">M1</span>
+          <span class="side-name">MSO Foundations</span>
+          <span class="side-pages">2p</span>
+        </div>
+        <div class="side-desc">Tokens, context budget, sampling, tiers &amp; transport</div>
+      </button>
+
+      <button class="side-btn" data-target="m2" onclick="selectModule('m2')">
+        <div class="side-btn-top">
+          <span class="side-tag">M2</span>
+          <span class="side-name">Prompting, Agents &amp; Tools</span>
+          <span class="side-pages">4p</span>
+        </div>
+        <div class="side-desc">JSON schema, thinking carry-back, SSE, compaction</div>
+      </button>
+
+      <button class="side-btn" data-target="m3" onclick="selectModule('m3')">
+        <div class="side-btn-top">
+          <span class="side-tag">M3</span>
+          <span class="side-name">Claude Code, MCP &amp; Auth</span>
+          <span class="side-pages">5p</span>
+        </div>
+        <div class="side-desc">Modes, CLAUDE.md, hooks, plugins, MCP &amp; OAuth</div>
+      </button>
+
+      <button class="side-btn" data-target="m4" onclick="selectModule('m4')">
+        <div class="side-btn-top">
+          <span class="side-tag">M4</span>
+          <span class="side-name">Prod Eng, Evals &amp; Security</span>
+          <span class="side-pages">4p</span>
+        </div>
+        <div class="side-desc">Calibrated judges, seam tests, retries, PreToolUse</div>
+      </button>
+
+      <button class="side-btn" data-target="m5" onclick="selectModule('m5')">
+        <div class="side-btn-top">
+          <span class="side-tag">M5</span>
+          <span class="side-name">Accelerators &amp; IP</span>
+          <span class="side-pages">3p</span>
+        </div>
+        <div class="side-desc">Reusable templates, pinned IDs, residency, seams</div>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      💡 Tip: Use <b style="color:#ffd966">← / →</b> keys to flip modules, or <b style="color:#ffd966">Esc</b> for index.
+    </div>
+  </aside>
+
+  <!-- ======================= MAIN COLUMN ======================= -->
+  <div class="main-col">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="topbar">
+      <div class="brand">
+        <button class="toggle-side-btn" onclick="toggleSidebar()" title="Toggle Side Panel">☰</button>
+        <span class="brand-badge">Claude Prep</span>
+        <span class="brand-title" id="topBarTitle">Handwritten Study Notebook</span>
+      </div>
+
+      <div class="controls">
+        <button class="ctrl-btn" id="prevModBtn" onclick="stepModule(-1)" disabled title="Previous Module (←)">← Prev</button>
+        <button class="ctrl-btn" id="nextModBtn" onclick="stepModule(1)" title="Next Module (→)">Next →</button>
+        <button class="ctrl-btn" id="printBtn" onclick="printCurrent()" title="Print / Save PDF">🖨 Print</button>
+        <a class="ctrl-btn" id="openRawLink" href="mso_foundations_notes.html" target="_blank" style="display:none" title="Open standalone HTML in new tab">↗ Standalone</a>
+      </div>
+    </header>
+
+    <!-- MAIN VIEW AREA -->
+    <div class="view-container">
 
   <!-- 1. BINDER COVER / INDEX VIEW -->
   <div id="indexView">
@@ -473,7 +676,9 @@
     <iframe id="readerFrame" title="Study Notes Reader"></iframe>
   </div>
 
-</div>
+    </div><!-- /.view-container -->
+  </div><!-- /.main-col -->
+</div><!-- /.app-shell -->
 
 <script>
   const MODULES = {
@@ -487,14 +692,26 @@
   const ORDER = ['index', 'm1', 'm2', 'm3', 'm4', 'm5'];
   let currentKey = 'index';
 
+  function toggleSidebar() {
+    document.getElementById('sidebarPanel').classList.toggle('collapsed');
+  }
+
   function selectModule(key, updateHash = true) {
     if (!MODULES[key]) key = 'index';
     currentKey = key;
 
-    // Update active tab
-    document.querySelectorAll('#moduleTabs .tab-btn').forEach(btn => {
+    // Update active state in side panel
+    document.querySelectorAll('#sideModuleNav .side-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.target === key);
     });
+
+    // Update top bar title to show active module
+    const titleEl = document.getElementById('topBarTitle');
+    if (titleEl) {
+      titleEl.textContent = key === 'index'
+        ? 'Handwritten Study Notebook'
+        : MODULES[key].title;
+    }
 
     const indexView = document.getElementById('indexView');
     const readerView = document.getElementById('readerView');
