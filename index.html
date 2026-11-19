@@ -422,6 +422,43 @@
     font-size: 14.5px;
     line-height: 20px;
   }
+  .contact-section {
+    width: min(600px, calc(100% - 32px));
+    margin: 0 auto 32px;
+    padding: 20px;
+    border: 2px solid #2d2d2d;
+    border-radius: 14px;
+    background: #fbfaf7;
+    color: #2d2d2d;
+  }
+  .contact-section h2 { margin: 0 0 8px; }
+  .contact-form {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .contact-form input, .contact-form textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #555d69;
+    border-radius: 6px;
+    font: inherit;
+  }
+  .contact-form textarea { resize: vertical; }
+  .contact-form button {
+    justify-self: start;
+    padding: 8px 16px;
+    border: 0;
+    border-radius: 6px;
+    background: #1a4cb0;
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+  }
+  .contact-form button:hover { background: #143b8b; }
+  @media print {
+    .contact-section { display: none; }
+  }
   .code {
     color: #2d2d2d;
     background: rgba(0,0,0,.05);
@@ -509,6 +546,13 @@
           <span class="side-pages">3p</span>
         </div>
         <div class="side-desc">Reusable templates, pinned IDs, residency, seams</div>
+      </button>
+
+      <button class="side-btn" onclick="selectModule('index'); document.getElementById('contact').scrollIntoView()">
+        <div class="side-btn-top">
+          <span class="side-name">Contact</span>
+        </div>
+        <div class="side-desc">Get in touch for a discussion</div>
       </button>
     </nav>
 
@@ -669,6 +713,22 @@
         <span class="hl">⑤ Secrets &amp; Paths</span> (never inline keys in <span class="code">.mcp.json</span> or hardcode local paths in <span class="code">SKILL.md</span> / accelerators).
       </div>
     </section>
+
+    <section class="contact-section" id="contact" aria-labelledby="contact-title">
+      <h2 id="contact-title">Let's talk</h2>
+      <p>Have a question or want to discuss the notes? Send a message below.</p>
+      <form class="contact-form" id="contact-form" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="18162ce1-9cf5-4118-a444-af1dfa6a8d77">
+        <label for="contact-email">Email</label>
+        <input id="contact-email" type="email" name="email" autocomplete="email" required>
+        <label for="contact-message">Message</label>
+        <textarea id="contact-message" name="message" rows="5" required></textarea>
+        <div class="h-captcha" data-captcha="true"></div>
+        <p id="captcha-error" role="alert" hidden>Please complete the CAPTCHA. If it does not load, check your connection and try again.</p>
+        <noscript>JavaScript is required to complete the CAPTCHA and send a message.</noscript>
+        <button type="submit" disabled>Send message</button>
+      </form>
+    </section>
   </div>
 
   <!-- 2. EMBEDDED READER VIEW -->
@@ -681,6 +741,19 @@
 </div><!-- /.app-shell -->
 
 <script>
+  const contactForm = document.getElementById('contact-form');
+  const captchaError = document.getElementById('captcha-error');
+  contactForm.querySelector('button[type="submit"]').disabled = false;
+  contactForm.addEventListener('submit', event => {
+    const response = contactForm.querySelector('[name="h-captcha-response"]');
+    if (!response || !response.value.trim()) {
+      event.preventDefault();
+      captchaError.hidden = false;
+    } else {
+      captchaError.hidden = true;
+    }
+  });
+
   const MODULES = {
     index: { title: 'Binder Index', file: null },
     m1: { title: 'Module 1 – MSO Foundations', file: 'mso_foundations_notes.html' },
@@ -780,6 +853,7 @@
     }
   });
 </script>
+<script src="https://web3forms.com/client/script.js" async defer></script>
 
 </body>
 </html>
